@@ -40,6 +40,16 @@ const userSchema = new Schema(
       required: true,
       enum: ["user", "moderator", "admin"],
     },
+    password: {
+      type: String,
+      required: true,
+    },
+    username: {
+      type: String,
+      minLength: [6, "Username must be at least 6 characters long"],
+      maxLength: [24, "Username must be at most 24 characters long"],
+      required: true,
+    },
     zebedeeWalletId: {
       type: String,
       maxLength: [100, "Zebedee Wallet ID must be at most 100 characters long"],
