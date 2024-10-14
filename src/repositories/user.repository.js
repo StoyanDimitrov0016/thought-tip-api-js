@@ -6,9 +6,14 @@ class UserRepository {
     return user;
   }
 
+  async checkUserExistence(filter) {
+    const match = await UserModel.exists(filter);
+    return match;
+  }
+
   async createUser(data) {
     const result = await UserModel.create(data);
-    return result;
+    return result.toObject();
   }
 
   async updateUserById(userId, data) {
