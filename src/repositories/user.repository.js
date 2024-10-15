@@ -11,6 +11,14 @@ class UserRepository {
     return match;
   }
 
+  async getUserByEmailOrUsername(email, username) {
+    const user = await UserModel.findOne({
+      $or: [{ email }, { username }],
+    }).lean();
+
+    return user;
+  }
+
   async createUser(data) {
     const result = await UserModel.create(data);
     return result.toObject();
