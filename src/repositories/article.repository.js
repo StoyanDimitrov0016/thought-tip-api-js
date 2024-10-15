@@ -34,6 +34,16 @@ class ArticleRepository {
     const result = await ArticleModel.findByIdAndDelete(articleId);
     return result;
   }
+
+  async getArticlesCount(query) {
+    const count = await ArticleModel.countDocuments(query);
+    return count;
+  }
+
+  async isUserArticleAuthor(articleId, userId) {
+    const matchedArticle = await ArticleModel.exists({ _id: articleId, author: userId });
+    return !!matchedArticle;
+  }
 }
 
 const articleRepository = new ArticleRepository();
