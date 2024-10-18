@@ -4,7 +4,7 @@ import {
   deleteAccount,
   updateAccount,
 } from "../services/user.service.js";
-import generateToken from "../utils/createJWT.js";
+import generateToken from "../utils/generateJWT.js";
 
 export const handleRegister = async (req, res, next) => {
   try {
