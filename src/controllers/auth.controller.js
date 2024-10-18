@@ -2,11 +2,11 @@ import authService from "../services/auth.service.js";
 
 const WEEK_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 7;
 
+// TODO: Add to cookie options "secure" property to "true" - this property should be set on https protocol
 const cookieOptions = {
   httpOnly: true,
   maxAge: WEEK_IN_MILLISECONDS,
   sameSite: "Lax",
-  // secure: true,
 };
 
 const login = async (req, res, next) => {
