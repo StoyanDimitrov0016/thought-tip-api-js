@@ -12,7 +12,14 @@ class ArticleRepository {
 
   async getArticles(query = {}, skip = 0, limit = 10, sort = { createdAt: -1 }) {
     const articles = await ArticleModel.find(query)
-      .select("-content")
+      .select("-content") // Exclude content field if you want a summary
+      .populate("author", "firstName lastName profilePicture") // Populate author details
+      .populate("topic", "name") // Populate topic name
+      .populate({
+        path: "tags", // Populate tags array
+        select: "name topicId", // Specify the fields to be populated for tags
+        populate: { path: "topicId", select: "name" }, // Nested populate for topic inside each tag (optional)
+      })
       .skip(skip)
       .limit(limit)
       .sort(sort)
@@ -21,8 +28,15 @@ class ArticleRepository {
   }
 
   async createArticle(data) {
-    const result = await ArticleModel.create(data);
-    return result;
+    try {
+      console.log("from repo - data", data);
+
+      const result = await ArticleModel.create(data);
+      console.log("from repo - result", result);
+      return result;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async updateArticleById(articleId, data) {
