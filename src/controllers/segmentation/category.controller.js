@@ -1,74 +1,56 @@
 import categoryService from "../../services/segmentation/category.service.js";
 
-const findAllCategories = async (req, res, next) => {
-  try {
-    const categories = await categoryService.findAllCategories();
-    res.status(200).json(categories);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const findCategory = async (req, res, next) => {
-  try {
-    const identifier = req.params.categoryIdentifier;
-
-    const category = await categoryService.findCategory(identifier);
-    if (!category) {
-      return res.status(404).json({ message: "Category not found" });
+class CategoryController {
+  async getCategoryBySlug(req, res) {
+    try {
+      const { slug } = req.params;
+      const category = await categoryService.getCategoryBySlug(slug);
+      res.status(200).json(category);
+    } catch (error) {
+      res.status(404).json({ error: error.message });
     }
-    res.status(200).json(category);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
-};
 
-const createCategory = async (req, res, next) => {
-  try {
-    const { categoryName } = req.body;
-    const newCategory = await categoryService.createCategory({ name: categoryName });
-    res.status(201).json(newCategory);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const updateCategory = async (req, res, next) => {
-  try {
-    const identifier = req.params.categoryIdentifier;
-    const updatedCategoryName = req.body.updatedCategoryName;
-
-    const updatedCategory = await categoryService.updateCategory(identifier, {
-      name: updatedCategoryName,
-    });
-    if (!updatedCategory) {
-      return res.status(404).json({ message: "Category not found" });
+  async getAllCategories(req, res) {
+    try {
+      const categories = await categoryService.getAllCategories();
+      res.status(200).json(categories);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to retrieve categories" });
     }
-
-    res.status(200).json(updatedCategory);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
-};
 
-const deleteCategory = async (req, res, next) => {
-  try {
-    const identifier = req.params.categoryIdentifier;
-
-    const result = await categoryService.deleteCategory(identifier);
-    //TODO: Check which status code is the best in this case - returning result message
-    res.status(200).json({ message: "Category deleted successfully", result });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  async createCategory(req, res) {
+    try {
+      const data = req.body;
+      const newCategory = await categoryService.createCategory(data);
+      res.status(201).json(newCategory);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
   }
-};
 
-const categoryController = {
-  findAllCategories,
-  findCategory,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-};
+  async updateCategory(req, res) {
+    try {
+      const { id } = req.params;
+      const data = req.body;
+      const updatedCategory = await categoryService.updateCategory(id, data);
+      res.status(200).json(updatedCategory);
+    } catch (error) {
+      res.status(404).json({ error: error.message });
+    }
+  }
 
+  async archiveCategory(req, res) {
+    try {
+      const { id } = req.params;
+      const archivedCategory = await categoryService.archiveCategory(id);
+      res.status(200).json(archivedCategory);
+    } catch (error) {
+      res.status(404).json({ error: error.message });
+    }
+  }
+}
+
+const categoryController = new CategoryController();
 export default categoryController;
