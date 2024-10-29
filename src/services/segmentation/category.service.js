@@ -1,7 +1,9 @@
+import mongoose from "mongoose";
 import categoryRepository from "../../repositories/segmentation/category.repository.js";
+import topicService from "./topic.service.js";
 
 class CategoryService {
-  async getCategoryById(id) {
+  async getOneById(id) {
     const category = await categoryRepository.findOneById(id);
     if (!category) {
       throw new Error(`Category with ID ${id} not found`);
@@ -9,7 +11,7 @@ class CategoryService {
     return category;
   }
 
-  async getCategoryBySlug(slug) {
+  async getOneBySlug(slug) {
     const category = await categoryRepository.findOneBySlug(slug);
     if (!category) {
       throw new Error(`Category with slug "${slug}" not found`);
@@ -17,36 +19,48 @@ class CategoryService {
     return category;
   }
 
-  async getCategoryByName(name) {
-    const category = await categoryRepository.findOneByName(name);
-    if (!category) {
-      throw new Error(`Category with name "${name}" not found`);
-    }
-    return category;
+  async getAll() {
+    return categoryRepository.findAll();
   }
 
-  async getAllCategories() {
-    return categoryRepository.findMany();
-  }
-
-  async createCategory(data) {
+  async createOne(data) {
     return categoryRepository.createOne(data);
   }
 
-  async updateCategory(id, data) {
-    const updatedCategory = await categoryRepository.updateOne(id, data);
+  async updateOneById(id, data) {
+    const updatedCategory = await categoryRepository.updateOneById(id, data);
     if (!updatedCategory) {
       throw new Error(`Failed to update category with ID ${id}`);
     }
     return updatedCategory;
   }
 
-  async archiveCategory(id) {
-    const archivedCategory = await categoryRepository.archiveOne(id);
-    if (!archivedCategory) {
-      throw new Error(`Failed to archive category with ID ${id}`);
+  async archiveOneById(id) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const category = await categoryRepository.findOneById(id);
+      if (!category) {
+        console.log(`Category not found under category ID: ${id}.`);
+        await session.abortTransaction();
+        return null;
+      }
+
+      const archivedTopics = await topicService.archiveAllByCategoryId(category._id);
+      const archivedCategory = await categoryRepository.archiveOneById(category._id);
+
+      await session.commitTransaction();
+      console.log("Successfully archived topics and tags for category ID:", id);
+
+      return { archivedCategory, archivedTopics };
+    } catch (error) {
+      await session.abortTransaction();
+      console.error(`Error archiving topics and tags for category ID ${id}:`, error);
+      throw error;
+    } finally {
+      session.endSession();
     }
-    return archivedCategory;
   }
 }
 
