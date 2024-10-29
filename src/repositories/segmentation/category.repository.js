@@ -1,24 +1,21 @@
-import mongoose from "mongoose";
 import CategoryModel from "../../models/segmentation/Category.model.js";
+import { validateMongooseObjectId } from "../../utils/mongooseIdsValidators.js";
 
 class CategoryRepository {
   async findOneById(id) {
-    if (mongoose.isValidObjectId(id) === false) {
+    const validationResult = validateMongooseObjectId(id, false);
+    if (!validationResult) {
       console.error("Invalid ID format for findOneById:", id);
       return null;
     }
-    return CategoryModel.findById(id).lean();
+    return CategoryModel.findById(validationResult).lean();
   }
 
   async findOneBySlug(slug) {
     return CategoryModel.findOne({ slug }).lean();
   }
 
-  async findOneByName(name) {
-    return CategoryModel.findOne({ name }).lean();
-  }
-
-  async findMany() {
+  async findAll() {
     // TODO: Add query-based search if needed for frontend or server-side filtering
     return CategoryModel.find().sort({ popularity: -1 }).lean();
   }
@@ -27,22 +24,26 @@ class CategoryRepository {
     return CategoryModel.create(data);
   }
 
-  async updateOne(id, data) {
-    if (mongoose.isValidObjectId(id) === false) {
-      console.error("Invalid ID format for updateOne:", id);
+  async updateOneById(id, data) {
+    const validationResult = validateMongooseObjectId(id, false);
+    if (!validationResult) {
+      console.error("Invalid ID format for updateOneById:", id);
       return null;
     }
-
-    return CategoryModel.findByIdAndUpdate(id, data, { new: true }).lean();
+    return CategoryModel.findByIdAndUpdate(validationResult, data, { new: true }).lean();
   }
 
-  async archiveOne(id) {
-    if (mongoose.isValidObjectId(id) === false) {
-      console.error("Invalid ID format for archiveOne:", id);
+  async archiveOneById(id) {
+    const validationResult = validateMongooseObjectId(id, false);
+    if (!validationResult) {
+      console.error("Invalid ID format for archiveOneById:", id);
       return null;
     }
-
-    return CategoryModel.findByIdAndUpdate(id, { status: "archived" }, { new: true }).lean();
+    return CategoryModel.findByIdAndUpdate(
+      validationResult,
+      { status: "archived" },
+      { new: true }
+    ).lean();
   }
 }
 
