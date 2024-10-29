@@ -1,10 +1,13 @@
 import mongoose from "mongoose";
 
-export const validateMongooseObjectId = (id) => {
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new Error("Invalid Object Id");
+export const validateMongooseObjectId = (id, strict = false) => {
+  const isIdValid = mongoose.Types.ObjectId.isValid(id);
+
+  if (strict && !isIdValid) {
+    throw new Error(`Invalid ID: ${id}`);
   }
-  return id;
+
+  return isIdValid ? id : null;
 };
 
 export const validateMongooseIdsInQuery = (query, fieldsToValidate) => {
