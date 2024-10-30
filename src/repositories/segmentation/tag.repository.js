@@ -1,115 +1,55 @@
 import TagModel from "../../models/segmentation/Tag.model.js";
-import {
-  validateMongooseObjectId,
-  validateMongooseIdsInQuery,
-} from "../../utils/mongooseIdsValidators.js";
+import { validateMongooseObjectId } from "../../utils/mongooseIdsValidators.js";
 
 class TagRepository {
-  async findById(id) {
-    try {
-      validateMongooseObjectId(id);
-      return await TagModel.findById(id).lean();
-    } catch (error) {
-      throw new Error(`Failed to find tag by ID: ${error.message}`);
+  async findOneById(id) {
+    const validationResult = validateMongooseObjectId(id, false);
+    if (!validationResult) {
+      console.error("Invalid ID format for findOneById:", id);
+      return null;
     }
+    return TagModel.findById(validationResult).lean();
   }
 
-  async findOneByQuery(query) {
-    try {
-      validateMongooseIdsInQuery(query, ["_id", "topicId"]);
-      return await TagModel.findOne(query).lean();
-    } catch (error) {
-      throw new Error(`Failed to find tag by query: ${error.message}`);
-    }
+  async findOneBySlug(slug) {
+    return TagModel.findOne({ slug }).lean();
   }
 
-  async findManyByQuery(query = {}) {
-    try {
-      validateMongooseIdsInQuery(query, ["_id", "topicId"]);
-      return await TagModel.find(query).lean();
-    } catch (error) {
-      throw new Error(`Failed to find tags: ${error.message}`);
+  async findAllByTopicId(topicId) {
+    const validationResult = validateMongooseObjectId(topicId, false);
+    if (!validationResult) {
+      console.error("Invalid topicId format for findAllByTopicId:", topicId);
+      return null;
     }
+    return TagModel.find({ topicId: validationResult }).sort({ name: 1 }).lean();
   }
 
-  async checkOneExists(query) {
-    try {
-      validateMongooseIdsInQuery(query, ["_id", "topicId"]);
-      return await TagModel.exists(query);
-    } catch (error) {
-      throw new Error(`Failed to check tag existence: ${error.message}`);
-    }
+  async createOne(data) {
+    return TagModel.create(data);
   }
 
-  async createOne(tagData) {
-    try {
-      validateMongooseObjectId(tagData.topicId);
-      return await TagModel.create(tagData);
-    } catch (error) {
-      throw new Error(`Failed to create tag: ${error.message}`);
+  async updateOneById(id, data) {
+    const validationResult = validateMongooseObjectId(id, false);
+    if (!validationResult) {
+      console.error("Invalid ID format for updateOneById:", id);
+      return null;
     }
+    return TagModel.findByIdAndUpdate(validationResult, data, { new: true }).lean();
   }
 
-  async createMany(tagsData) {
-    try {
-      tagsData.forEach((tag) => {
-        validateMongooseObjectId(tag.topicId);
-      });
-      return await TagModel.insertMany(tagsData);
-    } catch (error) {
-      throw new Error(`Failed to create tags: ${error.message}`);
+  async updateAllStatusesByTopicId(topicId, status) {
+    const validationResult = validateMongooseObjectId(topicId, false);
+    if (!validationResult) {
+      console.error("Invalid topicId format for updateManyByTopicId:", topicId);
+      return null;
     }
-  }
 
-  async updateOneById(id, updateData) {
-    try {
-      validateMongooseObjectId(id);
-      if (updateData.topicId) {
-        validateMongooseObjectId(updateData.topicId);
-      }
-      return await TagModel.findByIdAndUpdate(id, updateData, { new: true }).lean();
-    } catch (error) {
-      throw new Error(`Failed to update tag: ${error.message}`);
-    }
-  }
+    const updateResult = await TagModel.updateMany(
+      { topicId: validationResult },
+      { $set: { status } }
+    );
 
-  async updateOneByQuery(query, updateData) {
-    try {
-      validateMongooseIdsInQuery(query, ["_id", "topicId"]);
-      if (updateData.topicId) {
-        validateMongooseObjectId(updateData.topicId);
-      }
-      return await TagModel.findOneAndUpdate(query, updateData, { new: true }).lean();
-    } catch (error) {
-      throw new Error(`Failed to update tag: ${error.message}`);
-    }
-  }
-
-  async deleteOneById(id) {
-    try {
-      validateMongooseObjectId(id);
-      return await TagModel.findByIdAndDelete(id).lean();
-    } catch (error) {
-      throw new Error(`Failed to delete tag: ${error.message}`);
-    }
-  }
-
-  async deleteOneByQuery(query) {
-    try {
-      validateMongooseIdsInQuery(query, ["_id", "topicId"]);
-      return await TagModel.findOneAndDelete(query).lean();
-    } catch (error) {
-      throw new Error(`Failed to delete tag: ${error.message}`);
-    }
-  }
-
-  async deleteManyByTopicId(topicId) {
-    try {
-      validateMongooseObjectId(topicId);
-      return await TagModel.deleteMany({ topicId }).lean();
-    } catch (error) {
-      throw new Error(`Failed to delete tags by topic ID: ${error.message}`);
-    }
+    return updateResult;
   }
 }
 
