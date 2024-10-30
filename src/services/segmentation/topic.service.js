@@ -28,8 +28,29 @@ class TopicService {
     return topicRepository.createOne(data);
   }
 
-  async updateOne(id, data) {
+  async updateOneContent(id, data) {
     return topicRepository.updateOne(id, data);
+  }
+
+  async updateOneStatus(id, status) {
+    switch (status) {
+      case "active":
+        return topicRepository.updateOneById(id, { status: "active" });
+      case "inactive":
+        const tags = tagRepository.findAllByTopicId(id);
+        if (!Array.isArray(tags) || tags.length === 0) {
+          return topicRepository.updateOneById(id, { status: "inactive" });
+        }
+
+        break;
+      case "archived":
+        break;
+      case "in development":
+        break;
+
+      default:
+        break;
+    }
   }
 
   async archiveOneById(id) {
