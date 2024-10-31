@@ -2,19 +2,19 @@ import tagRepository from "../../repositories/segmentation/tag.repository.js";
 import topicRepository from "../../repositories/segmentation/topic.repository.js";
 
 class TagService {
-  async getOneById(id) {
+  async findOneById(id) {
     return tagRepository.findOneById(id);
   }
 
-  async getOneBySlug(slug) {
+  async findOneBySlug(slug) {
     return tagRepository.findOneBySlug(slug);
   }
 
-  async getAllByTopicId(topicId) {
+  async findAllByTopicId(topicId) {
     return tagRepository.findAllByCategoryId(topicId);
   }
 
-  async getAllByTopicSlug(topicSlug) {
+  async findAllByTopicSlug(topicSlug) {
     const topic = await topicRepository.findOneBySlug(topicSlug);
     if (!topic) {
       throw new Error("Topic not found");
@@ -22,20 +22,20 @@ class TagService {
     return tagRepository.findAllByCategoryId(topic._id);
   }
 
+  async findAllByTopicId(topicId) {
+    return tagRepository.findAllByTopicId(topicId);
+  }
+
   async createOne(data) {
     return tagRepository.createOne(data);
   }
 
-  async updateOne(id, data) {
+  async updateOneById(id, data) {
     return tagRepository.updateOne(id, data);
   }
 
-  async archiveOneById(id) {
-    return tagRepository.archiveOne(id);
-  }
-
-  async archiveAllByTopicId(topicId) {
-    return tagRepository.archiveAll(topicId);
+  async updateAllStatusesByTopicId(topicId, newStatus) {
+    return tagRepository.updateAllStatusesByTopicId(topicId, newStatus);
   }
 }
 
