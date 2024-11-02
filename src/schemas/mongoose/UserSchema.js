@@ -1,11 +1,13 @@
 import { Schema } from "mongoose";
 
-//TODO: Check clerk id length to set validation
 const userSchema = new Schema(
   {
-    clerkUserId: {
+    externalUserId: {
       type: String,
+      required: false,
       unique: true,
+      trim: true,
+      maxLength: [100, "Third-party ID must be at most 100 characters long"],
     },
     firstName: {
       type: String,
@@ -32,39 +34,45 @@ const userSchema = new Schema(
     },
     profilePicture: {
       type: String,
+      required: false,
+      trim: true,
       match: [/^https?:\/\/.*\.(?:png|jpg|jpeg|gif)$/, "Profile picture must be a valid URL"],
       maxLength: [2048, "URL is exceeding length standard"],
     },
-    role: {
-      type: String,
-      required: true,
-      enum: ["user", "moderator", "admin"],
-    },
-    password: {
+    encryptedPassword: {
       type: String,
       required: true,
     },
     username: {
       type: String,
+      required: true,
+      unique: true,
       minLength: [6, "Username must be at least 6 characters long"],
       maxLength: [24, "Username must be at most 24 characters long"],
-      required: true,
     },
     zebedeeWalletId: {
       type: String,
-      maxLength: [100, "Zebedee Wallet ID must be at most 100 characters long"],
+      required: false,
       trim: true,
+      maxLength: [100, "Zebedee Wallet ID must be at most 100 characters long"],
     },
     bio: {
       type: String,
-      maxLength: [300, "Bio must be at most 300 characters long"],
+      required: false,
       trim: true,
+      maxLength: [300, "Bio must be at most 300 characters long"],
+    },
+    articleLimit: {
+      type: Number,
+      default: 20,
+      min: [20, "Article limit cannot be less than the initial one (20 articles per user)"],
     },
   },
   { timestamps: true }
 );
 
 userSchema.index({ email: 1 });
-userSchema.index({ clerkUserId: 1 });
+userSchema.index({ username: 1 });
+userSchema.index({ externalUserId: 1 });
 
 export default userSchema;
