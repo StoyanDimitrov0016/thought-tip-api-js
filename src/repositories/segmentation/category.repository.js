@@ -33,6 +33,11 @@ class CategoryRepository {
     return CategoryModel.findByIdAndUpdate(validationResult, data, { new: true }).lean();
   }
 
+  async checkExistenceOfOne(query) {
+    const match = await CategoryModel.exists(query).lean();
+    return match;
+  }
+
   async archiveOneById(id) {
     const validationResult = validateMongooseObjectId(id, false);
     if (!validationResult) {
