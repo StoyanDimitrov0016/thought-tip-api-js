@@ -7,7 +7,7 @@ const userSchema = new Schema(
       required: false,
       unique: true,
       trim: true,
-      maxLength: [100, "Third-party ID must be at most 100 characters long"],
+      maxLength: [100, "External user ID must be at most 100 characters long"],
     },
     firstName: {
       type: String,
@@ -37,7 +37,7 @@ const userSchema = new Schema(
       required: false,
       trim: true,
       match: [/^https?:\/\/.*\.(?:png|jpg|jpeg|gif)$/, "Profile picture must be a valid URL"],
-      maxLength: [2048, "URL is exceeding length standard"],
+      maxLength: [2048, "Profile picture URL is too long"],
     },
     encryptedPassword: {
       type: String,
@@ -50,11 +50,11 @@ const userSchema = new Schema(
       minLength: [6, "Username must be at least 6 characters long"],
       maxLength: [24, "Username must be at most 24 characters long"],
     },
-    zebedeeWalletId: {
+    cryptoWalletCredentials: {
       type: String,
       required: false,
       trim: true,
-      maxLength: [100, "Zebedee Wallet ID must be at most 100 characters long"],
+      maxLength: [100, "Crypto wallet credentials must be at most 100 characters long"],
     },
     bio: {
       type: String,
@@ -66,6 +66,11 @@ const userSchema = new Schema(
       type: Number,
       default: 20,
       min: [20, "Article limit cannot be less than the initial one (20 articles per user)"],
+    },
+    userArticleCount: {
+      type: Number,
+      default: 0,
+      min: [0, "User article count cannot be negative"],
     },
   },
   { timestamps: true }
