@@ -7,11 +7,14 @@ const ArticleSchema = new Schema(
       required: [true, "Title is required"],
       minLength: [3, "Title must be at least 3 characters long"],
       maxLength: [100, "Title must be at most 100 characters long"],
-      match: [
-        /^[a-zA-Z0-9\s.,!?-]+$/,
-        "Title should contains only lower and upper case, numbers and basic punctuation symbols",
-      ],
+      match: [/^[a-zA-Z0-9\s.,!?()'":;&%$#@-]+$/, "Title contains unsupported characters"],
       trim: true,
+    },
+    slug: {
+      type: String,
+      required: [true, "Slug is required"],
+      trim: true,
+      unique: true,
     },
     thumbnail: {
       type: String,
