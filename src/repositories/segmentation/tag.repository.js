@@ -37,6 +37,11 @@ class TagRepository {
     return TagModel.findByIdAndUpdate(validationResult, data, { new: true }).lean();
   }
 
+  async checkExistenceOfOne(query) {
+    const match = await TagModel.exists(query).lean();
+    return match;
+  }
+
   async updateAllStatusesByTopicId(topicId, status) {
     const validationResult = validateMongooseObjectId(topicId, false);
     if (!validationResult) {
