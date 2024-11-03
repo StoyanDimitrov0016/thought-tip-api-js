@@ -4,11 +4,11 @@ import databaseConnection from "./src/config/databaseConnection.js";
 
 const startServer = async () => {
   try {
-    const PORT = process.env.PORT || 5000;
+    const PORT = envConfig.port || 5000;
 
     await databaseConnection();
     app.listen(PORT, () => {
-      console.log(`Server is listening on port: ${PORT}`);
+      console.log(`Server is listening on port: http://localhost:${PORT}`);
     });
   } catch (error) {
     console.error("Failed to start the server:", error.message);
