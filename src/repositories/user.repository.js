@@ -1,37 +1,64 @@
 import UserModel from "../models/User.model.js";
+import { validateMongooseObjectId } from "../utils/mongooseIdsValidators.js";
 
 class UserRepository {
-  async getUserById(userId) {
-    const user = await UserModel.findById(userId).lean();
-    return user;
+  async findOneByMongoId(id) {
+    const validationResult = validateMongooseObjectId(id, false);
+    if (!validationResult) {
+      console.error("Invalid ID format for findOneByMongoId:", id);
+      return null;
+    }
+    return await UserModel.findById(validationResult).lean();
   }
 
-  async checkUserExistence(filter) {
-    const match = await UserModel.exists(filter);
-    return match;
+  async findOneByExternalUserId(externalUserId) {
+    return await UserModel.findOne({ externalUserId }).lean();
   }
 
-  async getUserByEmailOrUsername(email, username) {
-    const user = await UserModel.findOne({
-      $or: [{ email }, { username }],
-    }).lean();
-
-    return user;
+  async findOneByQueryWithoutIds(query) {
+    return await UserModel.findOne(query).lean();
   }
 
-  async createUser(data) {
-    const result = await UserModel.create(data);
-    return result.toObject();
+  async createOne(data) {
+    return await UserModel.create(data);
   }
 
-  async updateUserById(userId, data) {
-    const result = await UserModel.findByIdAndUpdate(userId, data, { new: true }).lean();
-    return result;
+  async updateOneByMongoId(id, updateData) {
+    const validationResult = validateMongooseObjectId(id, false);
+    if (!validationResult) {
+      console.error("Invalid ID format for updateOneByMongoId:", id);
+      return null;
+    }
+    return await UserModel.findByIdAndUpdate(validationResult, updateData, { new: true }).lean();
   }
 
-  async deleteUserById(userId) {
-    const result = await UserModel.findByIdAndDelete(userId);
-    return result;
+  async updateOneByExternalUserId(externalUserId, updateData) {
+    return await UserModel.findOneAndUpdate({ externalUserId }, updateData, { new: true }).lean();
+  }
+
+  async updateOneByQueryWithoutIds(query, updateData) {
+    return await UserModel.findOneAndUpdate(query, updateData, { new: true }).lean();
+  }
+
+  async deleteOneByMongoId(id) {
+    const validationResult = validateMongooseObjectId(id, false);
+    if (!validationResult) {
+      console.error("Invalid ID format for deleteByMongoId:", id);
+      return null;
+    }
+    return await UserModel.findByIdAndDelete(validationResult).lean();
+  }
+
+  async deleteOneByExternalUserId(externalUserId) {
+    return await UserModel.findOneAndDelete({ externalUserId }).lean();
+  }
+
+  async deleteOneByQueryWithoutIds(query) {
+    return await UserModel.findOneAndDelete(query).lean();
+  }
+
+  async checkExistenceOfOne(filter) {
+    return await UserModel.exists(filter).lean();
   }
 }
 
