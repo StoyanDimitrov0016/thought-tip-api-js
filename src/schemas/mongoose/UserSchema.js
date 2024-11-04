@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import { INITIAL_USER_ARTICLE_COUNT, INITIAL_USER_ARTICLE_LIMIT } from "../../constants/user.js";
 
 const userSchema = new Schema(
   {
@@ -50,6 +51,18 @@ const userSchema = new Schema(
       minLength: [6, "Username must be at least 6 characters long"],
       maxLength: [24, "Username must be at most 24 characters long"],
     },
+    role: {
+      type: String,
+      enum: ["admin", "moderator", "regular"],
+      default: "regular",
+      required: true,
+    },
+    verificationLevel: {
+      type: String,
+      enum: ["none", "level1", "level2"],
+      default: "none",
+      required: true,
+    },
     cryptoWalletCredentials: {
       type: String,
       required: false,
@@ -64,13 +77,14 @@ const userSchema = new Schema(
     },
     articleLimit: {
       type: Number,
-      default: 20,
-      min: [20, "Article limit cannot be less than the initial one (20 articles per user)"],
+      default: INITIAL_USER_ARTICLE_LIMIT,
+      required: true,
+      min: [INITIAL_USER_ARTICLE_LIMIT, "Article limit cannot be less than the initial one"],
     },
     userArticleCount: {
       type: Number,
-      default: 0,
-      min: [0, "User article count cannot be negative"],
+      default: INITIAL_USER_ARTICLE_COUNT,
+      min: [INITIAL_USER_ARTICLE_COUNT, "User article count cannot be negative"],
     },
   },
   { timestamps: true }
