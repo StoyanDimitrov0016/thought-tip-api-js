@@ -48,6 +48,10 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
+      match: [
+        /^[a-zA-Z0-9_.]+$/,
+        "Username can only contain letters, numbers, underscores, or dots",
+      ],
       minLength: [6, "Username must be at least 6 characters long"],
       maxLength: [24, "Username must be at most 24 characters long"],
     },
