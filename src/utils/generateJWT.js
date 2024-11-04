@@ -7,6 +7,7 @@ const JWT_EXPIRATION_TIME_IN_STRING = "7d";
 const generateToken = (user) => {
   const payload = {
     id: user._id,
+    externalUserId: user.externalUserId,
     email: user.email,
     username: user.username,
     role: user.role,
