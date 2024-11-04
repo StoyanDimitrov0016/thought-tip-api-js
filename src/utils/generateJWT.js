@@ -9,11 +9,10 @@ const generateToken = (user) => {
     id: user._id,
     email: user.email,
     username: user.username,
+    role: user.role,
+    profilePicture: user.profilePicture,
+    verificationLevel: user.verificationLevel,
   };
-
-  if (user.profilePicture?.trim()) {
-    payload.profilePicture = user.profilePicture;
-  }
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRATION_TIME_IN_STRING });
   return token;
