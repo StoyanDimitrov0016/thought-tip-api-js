@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-import ApplicationErrorBase from "../errors/ApplicationErrorBase.js";
+import AppErrorBase from "../customErrors/AppErrorBase.js";
 import {
   AlreadyExistsError,
   DatabaseError,
   ValidationError,
   NotFoundError,
-} from "../errors/customErrors.js";
+} from "../customErrors/ErrorSubclasses.js";
 
 const extractErrorFieldsFromValidationError = (error) => {
   const errorsObject = error.errors;
@@ -25,7 +25,7 @@ const extractDuplicateField = (error) => {
 };
 
 const dbErrorHandler = (error) => {
-  if (error instanceof ApplicationErrorBase) {
+  if (error instanceof AppErrorBase) {
     throw error;
   }
 
@@ -54,6 +54,7 @@ const dbErrorHandler = (error) => {
     throw new DatabaseError(message);
   }
 
+  console.error("---Unexpected database error:", error);
   throw new DatabaseError("Unexpected database error occurred");
 };
 
