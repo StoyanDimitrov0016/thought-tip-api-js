@@ -1,101 +1,91 @@
-import ApplicationErrorBase from "./ApplicationErrorBase.js";
+import AppErrorBase from "./AppErrorBase.js";
 
-export class BadRequestError extends ApplicationErrorBase {
+export class BadRequestError extends AppErrorBase {
   constructor(
     detail = "The server could not understand the request due to invalid syntax.",
-    instance = "/",
     errors = [{ field: "unknown", message: "Invalid request syntax." }]
   ) {
-    super("Bad Request", 400, detail, instance, errors);
+    super("Bad Request", 400, detail, errors);
   }
 }
 
-export class ValidationError extends ApplicationErrorBase {
+export class ValidationError extends AppErrorBase {
   constructor(
     detail = "The data provided did not pass validation requirements.",
-    instance = "/",
     errors = [{ field: "validation", message: "Invalid data input." }]
   ) {
-    super("Bad Request - Validation Error", 400, detail, instance, errors);
+    super("Bad Request - Validation Error", 400, detail, errors);
   }
 }
 
-export class UnauthorizedError extends ApplicationErrorBase {
+export class UnauthorizedError extends AppErrorBase {
   constructor(
     detail = "The client must authenticate itself to get the requested response.",
-    instance = "/",
     errors = [{ field: "authorization", message: "Authentication required." }]
   ) {
-    super("Unauthorized", 401, detail, instance, errors);
+    super("Unauthorized", 401, detail, errors);
   }
 }
 
-export class ForbiddenError extends ApplicationErrorBase {
+export class ForbiddenError extends AppErrorBase {
   constructor(
     detail = "The client does not have access rights to the content.",
-    instance = "/",
     errors = [{ field: "authorization", message: "Access forbidden." }]
   ) {
-    super("Forbidden", 403, detail, instance, errors);
+    super("Forbidden", 403, detail, errors);
   }
 }
 
-export class NotFoundError extends ApplicationErrorBase {
+export class NotFoundError extends AppErrorBase {
   constructor(
     detail = "The server can not find the requested resource.",
-    instance = "/",
     errors = [{ field: "resource", message: "Resource not found." }]
   ) {
-    super("Not Found", 404, detail, instance, errors);
+    super("Not Found", 404, detail, errors);
   }
 }
 
-export class AlreadyExistsError extends ApplicationErrorBase {
+export class AlreadyExistsError extends AppErrorBase {
   constructor(
     detail = "The requested resource already exists.",
-    instance = "/",
     errors = [{ field: "resource", message: "Resource conflict - already exists." }]
   ) {
-    super("Conflict", 409, detail, instance, errors);
+    super("Conflict", 409, detail, errors);
   }
 }
 
-export class URITooLongError extends ApplicationErrorBase {
+export class URITooLongError extends AppErrorBase {
   constructor(
     detail = "The requested URI is too long for the server to process.",
-    instance = "/",
     errors = [{ field: "uri", message: "URI length exceeds server limit." }]
   ) {
-    super("URI Too Long", 414, detail, instance, errors);
+    super("URI Too Long", 414, detail, errors);
   }
 }
 
-export class TooManyRequestsError extends ApplicationErrorBase {
+export class TooManyRequestsError extends AppErrorBase {
   constructor(
     detail = "The client has sent too many requests in a given amount of time.",
-    instance = "/",
     errors = [{ field: "rate limit", message: "Rate limit exceeded." }]
   ) {
-    super("Too Many Requests", 429, detail, instance, errors);
+    super("Too Many Requests", 429, detail, errors);
   }
 }
 
-export class DatabaseError extends ApplicationErrorBase {
+export class DatabaseError extends AppErrorBase {
   constructor(
     detail = "A database error occurred during the request.",
-    instance = "/",
     errors = [{ field: "database", message: "Database query failed." }]
   ) {
-    super("Internal Server Error", 500, detail, instance, errors);
+    super("Internal Server Error", 500, detail, errors);
   }
 }
 
-export class InternalServerError extends ApplicationErrorBase {
+export class InternalServerError extends AppErrorBase {
   constructor(
     detail = "The server has encountered a situation it doesn't know how to handle.",
-    instance = "/",
     errors = [{ field: "server", message: "Internal server error." }]
   ) {
-    super("Internal Server Error", 500, detail, instance, errors);
+    super("Internal Server Error", 500, detail, errors);
   }
 }
