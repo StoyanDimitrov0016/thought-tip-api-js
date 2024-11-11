@@ -2,7 +2,12 @@ import { z } from "zod";
 
 const loginValidationSchema = z
   .object({
-    username: z.string().optional(),
+    username: z
+      .string()
+      .min(6, "Username must be at least 6 characters long")
+      .max(24, "Username must be at most 24 characters long")
+      .regex(/^[a-zA-Z0-9_.]+$/, "Username can only contain letters, numbers, underscores, or dots")
+      .optional(),
     email: z.string().email().optional(),
     password: z
       .string()
