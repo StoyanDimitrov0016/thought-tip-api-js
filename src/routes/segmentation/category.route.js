@@ -5,20 +5,9 @@ import checkSpecialAccess from "../../middleware/checkSpecialAccess.js";
 
 const categoryRouter = Router();
 
-categoryRouter.get("/", categoryController.getAllCategories);
-categoryRouter.get("/:slug", categoryController.getCategoryBySlug);
-categoryRouter.post("/", isAuthenticated, checkSpecialAccess, categoryController.createCategory);
-categoryRouter.patch(
-  "/:id",
-  isAuthenticated,
-  checkSpecialAccess,
-  categoryController.updateCategory
-);
-categoryRouter.delete(
-  "/:id",
-  isAuthenticated,
-  checkSpecialAccess,
-  categoryController.archiveCategory
-);
+categoryRouter.get("/:slug", categoryController.getOneBySlug);
+categoryRouter.get("/", categoryController.getAll);
+categoryRouter.post("/", isAuthenticated, checkSpecialAccess, categoryController.createOne);
+categoryRouter.patch("/:id", isAuthenticated, checkSpecialAccess, categoryController.updateOneById);
 
 export default categoryRouter;
