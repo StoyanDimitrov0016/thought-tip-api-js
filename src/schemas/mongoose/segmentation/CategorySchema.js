@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 
 const CategorySchema = new Schema(
   {
@@ -26,6 +26,7 @@ const CategorySchema = new Schema(
       minlength: [10, "Description must be at least 10 characters"],
       maxlength: [300, "Description cannot exceed 300 characters"],
     },
+    topics: [{ type: Types.ObjectId, ref: "Topic", required: true }],
     status: {
       type: String,
       enum: {
