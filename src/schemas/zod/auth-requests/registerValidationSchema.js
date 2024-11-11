@@ -4,8 +4,8 @@ const registerValidationSchema = z.object({
   email: z.string().email(),
   username: z
     .string()
-    .min(3)
-    .max(20)
+    .min(6, "Username must be at least 6 characters long")
+    .max(24, "Username must be at most 24 characters long")
     .regex(/^[a-zA-Z0-9_.]+$/, "Username can only contain letters, numbers, underscores, or dots"),
   password: z
     .string()
