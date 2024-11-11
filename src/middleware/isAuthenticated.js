@@ -1,24 +1,29 @@
-import jwt from "jsonwebtoken";
-import envConfig from "../config/envConfig.js";
+import userRepository from "../repositories/user.repository.js";
+import { ForbiddenError } from "../lib/errors/customErrors/ErrorSubclasses.js";
 
-const JWT_SECRET = envConfig.jwtSecret;
-
-const isAuthenticated = (req, res, next) => {
-  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Authentication token is missing" });
-
+const isAuthenticated = async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = { id: decoded.id };
+    if (!req.user) {
+      throw new ForbiddenError("User is not authenticated.", [
+        { field: "authentication", message: "No user information found in the request." },
+      ]);
+    }
+
+    const { id: requestedUserId } = req.user;
+
+    const userExists = await userRepository.checkExistenceOfOne({ _id: requestedUserId });
+    if (!userExists) {
+      throw new ForbiddenError("User does not exist or has been removed.", [
+        {
+          field: "userId",
+          message: "User record not found. Please ensure you are registered and logged in.",
+        },
+      ]);
+    }
 
     next();
   } catch (error) {
-    if (error.name === "TokenExpiredError") {
-      return res.status(403).json({ message: "Token has expired" });
-    } else if (error.name === "JsonWebTokenError") {
-      return res.status(403).json({ message: "Invalid token" });
-    }
-    return res.status(500).json({ message: "Authentication failed" });
+    next(error);
   }
 };
 
