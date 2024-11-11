@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import envConfig from "../config/envConfig.js";
-import jwtErrorHandler from "./handlers/jwtErrorHandler.js";
+import jwtErrorHandler from "../lib/errors/errorHandlers/jwtErrorHandler.js";
 
 const JWT_SECRET = envConfig.jwtSecret;
 const EXPIRATION_DURATION = "7d";
