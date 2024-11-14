@@ -26,14 +26,18 @@ const CategorySchema = new Schema(
       minlength: [10, "Description must be at least 10 characters"],
       maxlength: [300, "Description cannot exceed 300 characters"],
     },
-    topics: [{ type: Types.ObjectId, ref: "Topic", required: true }],
+    topicPartials: {
+      type: [
+        {
+          id: { type: Types.ObjectId, ref: "Topic", required: true },
+          slug: { type: String, required: true, trim: true },
+        },
+      ],
+      default: [],
+    },
     status: {
       type: String,
-      enum: {
-        values: ["active", "inactive", "archived", "in development"],
-        message:
-          "Invalid status! Supported statuses are: 'active', 'inactive', 'archived', 'in development'.",
-      },
+      enum: ["active", "inactive", "archived", "in development"],
       default: "in development",
     },
     popularity: {
