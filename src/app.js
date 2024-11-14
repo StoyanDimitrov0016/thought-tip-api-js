@@ -8,7 +8,8 @@ import authRouter from "./routes/auth.route.js";
 import profileRouter from "./routes/profile.route.js";
 import userRouter from "./routes/user.route.js";
 import articleRouter from "./routes/article.route.js";
-import resourceRouter from "./routes/resource.route.js";
+import segmentationRouter from "./routes/segmentation.route.js";
+
 import globalErrorHandler from "./middleware/globalErrorHandler.js";
 
 const app = express();
@@ -22,13 +23,13 @@ const corsOptions = {
 
 const middlewareArray = [cors(corsOptions), express.json(), cookieParser(), setUserIfTokenExists];
 
-app.use(middlewareArray);
+app.use(cors(corsOptions), express.json(), cookieParser(), setUserIfTokenExists);
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/my/profile", profileRouter);
 app.use("/api/v1/articles", articleRouter);
-app.use("/api/v1/resources", resourceRouter);
+app.use("/api/v1/segmentation", segmentationRouter);
 app.use(globalErrorHandler);
 
 export default app;
@@ -70,9 +71,9 @@ DELETE `/api/v1/authors/:id/follow`     // Unfollow an author (auth required)
 -- PUBLISHED ARTICLES ROUTES --
 GET `/api/v1/articles/:id`              // Get article
 GET `/api/v1/articles`                  // Get articles by search params
-GET `/api/v1/articles/:id/like`         // Git a boolean value depending if you have liked the article
-POST `/api/v1/articles/:id/like`         // Git a boolean value depending if you have liked the article
-DELETE `/api/v1/articles/:id/like`         // Git a boolean value depending if you have liked the article
+GET `/api/v1/articles/:id/like`         // Get a boolean value depending if you have liked the article
+POST `/api/v1/articles/:id/like`         // Get a boolean value depending if you have liked the article
+DELETE `/api/v1/articles/:id/like`         // Get a boolean value depending if you have liked the article
 POST `/api/v1/articles`                 // Publish article (auth required)
 PATCH `/api/v1/articles`                // Update a published article (auth required)
 DELETE `/api/v1/articles`               // Delete a published article (auth required)
