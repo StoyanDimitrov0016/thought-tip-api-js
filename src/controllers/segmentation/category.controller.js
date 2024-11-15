@@ -1,53 +1,104 @@
+import CategoryLinkBuilder from "../../lib/linkBuilders/subclasses/CategoryLinkBuilder.js";
+import CreatedResponse from "../../lib/responses/successResponses/CreatedResponse.js";
+import OkPaginatedResponse from "../../lib/responses/successResponses/OkPaginatedResponse.js";
+import OkSingleResponse from "../../lib/responses/successResponses/OkSingleResponse.js";
 import categoryService from "../../services/segmentation/category.service.js";
 
 class CategoryController {
-  async getCategoryBySlug(req, res) {
+  async getOneBySlug(req, res, next) {
     try {
       const { slug } = req.params;
-      const category = await categoryService.getCategoryBySlug(slug);
-      res.status(200).json(category);
+      const instance = req.originalUrl;
+
+      const category = await categoryService.getOneBySlug(slug);
+
+      const response = new OkSingleResponse(
+        "Successful category retrieval",
+        "The category you requested has been successfully retrieved",
+        instance,
+        { category }
+      );
+      res.status(response.status).json(response);
     } catch (error) {
-      res.status(404).json({ error: error.message });
+      next(error);
     }
   }
 
-  async getAllCategories(req, res) {
+  async getMany(req, res, next) {
     try {
-      const categories = await categoryService.getAllCategories();
-      res.status(200).json(categories);
+      const instance = req.originalUrl;
+      const {
+        page = 1,
+        size = 10,
+        sort = "popularity",
+        direction = "desc",
+        ...filters
+      } = req.query;
+
+      const sortOrder = direction === "asc" ? 1 : -1;
+      const sortBy = { [sort]: sortOrder };
+
+      const { categories, metadata } = await categoryService.getPaginatedCategories(
+        filters,
+        page,
+        size,
+        sortBy
+      );
+
+      const response = new OkPaginatedResponse(
+        "Successful categories retrieval.",
+        "The categories you requested have been successfully retrieved.",
+        instance,
+        { categories },
+        metadata
+      );
+
+      res.status(response.status).json(response);
     } catch (error) {
-      res.status(500).json({ error: "Failed to retrieve categories" });
+      next(error);
     }
   }
 
-  async createCategory(req, res) {
+  async createOne(req, res, next) {
     try {
-      const data = req.body;
-      const newCategory = await categoryService.createCategory(data);
-      res.status(201).json(newCategory);
+      const instance = req.originalUrl;
+      const categoryCreateData = req.body;
+
+      const newCategory = await categoryService.createOne(categoryCreateData);
+
+      const response = new CreatedResponse(
+        "Category created",
+        "Category successfully created",
+        instance,
+        { category: newCategory }
+      );
+
+      res.status(response.status).json(response);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   }
 
-  async updateCategory(req, res) {
+  async updateOneById(req, res, next) {
     try {
-      const { id } = req.params;
-      const data = req.body;
-      const updatedCategory = await categoryService.updateCategory(id, data);
-      res.status(200).json(updatedCategory);
-    } catch (error) {
-      res.status(404).json({ error: error.message });
-    }
-  }
+      const instance = req.originalUrl;
+      const categoryId = req.params.id;
+      const categoryUpdateData = req.body;
 
-  async archiveCategory(req, res) {
-    try {
-      const { id } = req.params;
-      const archivedCategory = await categoryService.archiveCategory(id);
-      res.status(200).json(archivedCategory);
+      const updatedCategory = await categoryService.updateOneById(categoryId, categoryUpdateData);
+
+      const response = new CreatedResponse(
+        "Category updated",
+        "Category successfully updated",
+        instance,
+        {
+          category: updatedCategory,
+        }
+      );
+
+      res.status(response.status).json(response);
     } catch (error) {
-      res.status(404).json({ error: error.message });
+      next(error);
     }
   }
 }
