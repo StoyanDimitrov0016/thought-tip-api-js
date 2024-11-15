@@ -1,68 +1,79 @@
-import mongoose from "mongoose";
 import categoryRepository from "../../repositories/segmentation/category.repository.js";
-import topicService from "./topic.service.js";
+import { NotFoundError } from "../../lib/errors/customErrors/ErrorSubclasses.js";
+import appendLinksToDocument from "../../utils/appendLinksToDocument.js";
+import validatePaginationParams from "../../utils/validatePaginationParams.js";
+import createPaginationMetadata from "../../utils/createPaginationMetadata.js";
 
 class CategoryService {
-  async getOneById(id) {
-    const category = await categoryRepository.findOneById(id);
+  appendLinks(category) {
+    return appendLinksToDocument("category", category);
+  }
+
+  async getOneById(categoryId) {
+    const category = await categoryRepository.findOneById(categoryId);
     if (!category) {
-      throw new Error(`Category with ID ${id} not found`);
+      throw new NotFoundError(`Category with ID "${categoryId}" not found.`, [
+        { field: "id", message: "Category not found." },
+      ]);
     }
-    return category;
+
+    return this.appendLinks(category);
   }
 
   async getOneBySlug(slug) {
-    const category = await categoryRepository.findOneBySlug(slug);
+    const category = await categoryRepository.findOneByFilter({ slug });
     if (!category) {
-      throw new Error(`Category with slug "${slug}" not found`);
+      throw new NotFoundError(`Category with slug "${slug}" not found.`, [
+        { field: "slug", message: "Category with such slug not found." },
+      ]);
     }
-    return category;
+
+    return this.appendLinks(category);
   }
 
-  async getAll() {
-    return categoryRepository.findAll();
+  async getPaginatedCategories(filter = {}, page = 1, size = 10, sort = { popularity: -1 }) {
+    const { validPage, validSize, skip } = validatePaginationParams(page, size);
+
+    const [categories, totalCount] = await Promise.all([
+      categoryRepository.findManyByFilter(filter, validSize, skip, sort),
+      categoryRepository.countDocumentsByFilter(filter),
+    ]);
+
+    if (!categories.length) {
+      throw new NotFoundError("No categories found.", [
+        { field: "categories", message: "No categories match the specified criteria." },
+      ]);
+    }
+
+    const categoriesWithLinks = categories.map(this.appendLinks);
+
+    return {
+      categories: categoriesWithLinks,
+      metadata: createPaginationMetadata({
+        totalCount,
+        validPage,
+        validSize,
+        sort,
+        filters: filter,
+      }),
+    };
   }
 
   async createOne(data) {
-    return categoryRepository.createOne(data);
+    const newCategory = await categoryRepository.createOne(data);
+    return this.appendLinks(newCategory);
   }
 
   async updateOneById(id, data) {
     const updatedCategory = await categoryRepository.updateOneById(id, data);
     if (!updatedCategory) {
-      throw new Error(`Failed to update category with ID ${id}`);
+      throw new NotFoundError(`Category with ID "${id}" not found for update.`, [
+        { field: "id", message: "Category update failed because it was not found." },
+      ]);
     }
+
     return updatedCategory;
   }
-
-  async archiveOneById(id) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-      const category = await categoryRepository.findOneById(id);
-      if (!category) {
-        console.log(`Category not found under category ID: ${id}.`);
-        await session.abortTransaction();
-        return null;
-      }
-
-      const archivedTopics = await topicService.archiveAllByCategoryId(category._id);
-      const archivedCategory = await categoryRepository.archiveOneById(category._id);
-
-      await session.commitTransaction();
-      console.log("Successfully archived topics and tags for category ID:", id);
-
-      return { archivedCategory, archivedTopics };
-    } catch (error) {
-      await session.abortTransaction();
-      console.error(`Error archiving topics and tags for category ID ${id}:`, error);
-      throw error;
-    } finally {
-      session.endSession();
-    }
-  }
 }
-
 const categoryService = new CategoryService();
 export default categoryService;
