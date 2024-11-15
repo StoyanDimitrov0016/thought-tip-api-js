@@ -1,54 +1,72 @@
 import CategoryModel from "../../models/segmentation/Category.model.js";
-import { validateMongooseObjectId } from "../../utils/mongooseIdsValidators.js";
+import dbErrorHandler from "../../lib/errors/errorHandlers/dbErrorHandler.js";
+import mongoDocumentFormatter from "../../utils/mongoDocumentFormatter.js";
 
 class CategoryRepository {
   async findOneById(id) {
-    const validationResult = validateMongooseObjectId(id, false);
-    if (!validationResult) {
-      console.error("Invalid ID format for findOneById:", id);
-      return null;
+    try {
+      const category = await CategoryModel.findById(id).lean();
+      return mongoDocumentFormatter(category);
+    } catch (error) {
+      dbErrorHandler(error);
     }
-    return CategoryModel.findById(validationResult).lean();
   }
 
-  async findOneBySlug(slug) {
-    return CategoryModel.findOne({ slug }).lean();
-  }
-
-  async findAll() {
-    // TODO: Add query-based search if needed for frontend or server-side filtering
-    return CategoryModel.find().sort({ popularity: -1 }).lean();
-  }
-
-  async createOne(data) {
-    return CategoryModel.create(data);
-  }
-
-  async updateOneById(id, data) {
-    const validationResult = validateMongooseObjectId(id, false);
-    if (!validationResult) {
-      console.error("Invalid ID format for updateOneById:", id);
-      return null;
+  async findOneByFilter(filter = {}) {
+    try {
+      const category = await CategoryModel.findOne(filter).lean();
+      return mongoDocumentFormatter(category);
+    } catch (error) {
+      dbErrorHandler(error);
     }
-    return CategoryModel.findByIdAndUpdate(validationResult, data, { new: true }).lean();
   }
 
-  async checkExistenceOfOne(query) {
-    const match = await CategoryModel.exists(query).lean();
-    return match;
-  }
-
-  async archiveOneById(id) {
-    const validationResult = validateMongooseObjectId(id, false);
-    if (!validationResult) {
-      console.error("Invalid ID format for archiveOneById:", id);
-      return null;
+  async findManyByFilter(filter = {}, size = 10, skip = 0, sort = { popularity: -1 }) {
+    try {
+      const categories = await CategoryModel.find(filter).sort(sort).skip(skip).limit(size).lean();
+      return mongoDocumentFormatter(categories);
+    } catch (error) {
+      dbErrorHandler(error);
     }
-    return CategoryModel.findByIdAndUpdate(
-      validationResult,
-      { status: "archived" },
-      { new: true }
-    ).lean();
+  }
+
+  async createOne(createData) {
+    try {
+      const newCategory = await CategoryModel.create(createData);
+      return mongoDocumentFormatter(newCategory.toObject());
+    } catch (error) {
+      dbErrorHandler(error);
+    }
+  }
+
+  async updateOneById(id, updateData, session = null) {
+    try {
+      const updatedDocument = await CategoryModel.findByIdAndUpdate(id, updateData, {
+        new: true,
+      })
+        .session(session)
+        .lean();
+      return mongoDocumentFormatter(updatedDocument);
+    } catch (error) {
+      dbErrorHandler(error);
+    }
+  }
+
+  async checkOneByFilter(filter = {}) {
+    try {
+      const exists = await CategoryModel.exists(filter);
+      return mongoDocumentFormatter(exists);
+    } catch (error) {
+      dbErrorHandler(error);
+    }
+  }
+
+  async countDocumentsByFilter(filter = {}) {
+    try {
+      return await CategoryModel.countDocuments(filter);
+    } catch (error) {
+      dbErrorHandler(error);
+    }
   }
 }
 
