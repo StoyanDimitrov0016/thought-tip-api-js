@@ -46,7 +46,7 @@ const dbErrorHandler = (error) => {
   if (error instanceof mongoose.mongo.MongoServerError && error.code === 11000) {
     const { duplicateKey, duplicateValue } = extractDuplicateField(error);
     const errorMessage = `Duplicate entry: ${duplicateKey} with value ${duplicateValue} already exists.`;
-    throw new AlreadyExistsError(errorMessage);
+    throw new AlreadyExistsError(errorMessage, { field: duplicateKey, message: errorMessage });
   }
 
   if (error instanceof mongoose.Error.MongooseServerSelectionError) {
