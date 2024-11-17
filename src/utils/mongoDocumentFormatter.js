@@ -16,7 +16,7 @@ const mongoDocumentFormatter = (document) => {
       if (docCopy[key] instanceof mongoose.Types.ObjectId) {
         docCopy[key] = docCopy[key].toHexString();
       } else if (docCopy[key] instanceof Date) {
-        continue;
+        docCopy[key] = docCopy[key].toISOString();
       } else if (typeof docCopy[key] === "object") {
         docCopy[key] = mongoDocumentFormatter(docCopy[key]);
       }
