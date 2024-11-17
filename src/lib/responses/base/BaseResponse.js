@@ -1,6 +1,6 @@
-import { BASE_RESPONSE_DEFAULTS } from "../helpers/responseDefaultValues.js";
+import { BASE_RESPONSE_DEFAULTS } from "../../../constants/responses/defaultValues/baseResponseDefaults.js";
 
-const { INSTANCE, TYPE } = BASE_RESPONSE_DEFAULTS;
+const { TYPE, INSTANCE } = BASE_RESPONSE_DEFAULTS;
 
 class BaseResponse {
   constructor(status, success, format, title, detail, instance = INSTANCE) {

@@ -1,5 +1,5 @@
 import BaseResponse from "../base/BaseResponse.js";
-import { ERROR_RESPONSE_DEFAULTS } from "../helpers/responseDefaultValues.js";
+import { ERROR_RESPONSE_DEFAULTS } from "../../../constants/responses/defaultValues/mainResponsesDefaults.js";
 import envConfig from "../../../config/envConfig.js";
 
 const { STATUS, TITLE, DETAILS, SUCCESS, FORMAT, ERRORS, CALLSTACK } = ERROR_RESPONSE_DEFAULTS;

@@ -1,4 +1,4 @@
-import { OK_LIST_RESPONSE_DEFAULTS } from "../helpers/responseDefaultValues.js";
+import { OK_LIST_RESPONSE_DEFAULTS } from "../../../constants/responses/defaultValues/successResponsesDefaults.js";
 import SuccessResponse from "../main/SuccessResponse.js";
 
 const { STATUS, TITLE, DETAIL, FORMAT, DATA, METADATA } = OK_LIST_RESPONSE_DEFAULTS;

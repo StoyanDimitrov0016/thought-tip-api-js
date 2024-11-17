@@ -1,5 +1,5 @@
+import { SUCCESS_RESPONSE_DEFAULTS } from "../../../constants/responses/defaultValues/mainResponsesDefaults.js";
 import BaseResponse from "../base/BaseResponse.js";
-import { SUCCESS_RESPONSE_DEFAULTS } from "../helpers/responseDefaultValues.js";
 
 const { STATUS, TITLE, DETAIL, SUCCESS } = SUCCESS_RESPONSE_DEFAULTS;
 
