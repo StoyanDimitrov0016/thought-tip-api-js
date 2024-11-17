@@ -1,67 +1,50 @@
 import categoryRepository from "../../repositories/segmentation/category.repository.js";
 import { NotFoundError } from "../../lib/errors/customErrors/ErrorSubclasses.js";
-import appendLinksToDocument from "../../utils/appendLinksToDocument.js";
-import validatePaginationParams from "../../utils/validatePaginationParams.js";
-import createPaginationMetadata from "../../utils/createPaginationMetadata.js";
+import { appendInteractionToEntry } from "../../lib/responses/helpers/interaction/appendInteractionToEntry.js";
 
 class CategoryService {
-  appendLinks(category) {
-    return appendLinksToDocument("category", category);
+  attachInteraction(entry, user) {
+    return appendInteractionToEntry("category", entry, user);
   }
 
-  async getOneById(categoryId) {
+  async getOneById(categoryId, user) {
     const category = await categoryRepository.findOneById(categoryId);
     if (!category) {
       throw new NotFoundError(`Category with ID "${categoryId}" not found.`, [
-        { field: "id", message: "Category not found." },
+        { field: "id", message: "No category exists with the specified ID." },
       ]);
     }
 
-    return this.appendLinks(category);
+    return this.attachInteraction(category, user);
   }
 
-  async getOneBySlug(slug) {
+  async getOneBySlug(slug, user) {
     const category = await categoryRepository.findOneByFilter({ slug });
     if (!category) {
       throw new NotFoundError(`Category with slug "${slug}" not found.`, [
-        { field: "slug", message: "Category with such slug not found." },
+        { field: "slug", message: "No category exists with the specified slug." },
       ]);
     }
 
-    return this.appendLinks(category);
+    return this.attachInteraction(category, user);
   }
 
-  async getPaginatedCategories(filter = {}, page = 1, size = 10, sort = { popularity: -1 }) {
-    const { validPage, validSize, skip } = validatePaginationParams(page, size);
-
-    const [categories, totalCount] = await Promise.all([
-      categoryRepository.findManyByFilter(filter, validSize, skip, sort),
-      categoryRepository.countDocumentsByFilter(filter),
-    ]);
+  async getAll(user) {
+    const categories = await categoryRepository.findManyByFilter();
 
     if (!categories.length) {
       throw new NotFoundError("No categories found.", [
-        { field: "categories", message: "No categories match the specified criteria." },
+        { field: "categories", message: "No categories are currently available." },
       ]);
     }
 
-    const categoriesWithLinks = categories.map(this.appendLinks);
-
-    return {
-      categories: categoriesWithLinks,
-      metadata: createPaginationMetadata({
-        totalCount,
-        validPage,
-        validSize,
-        sort,
-        filters: filter,
-      }),
-    };
+    const enhancedCategories = categories.map((c) => this.attachInteraction(c, user));
+    return enhancedCategories;
   }
 
   async createOne(data) {
     const newCategory = await categoryRepository.createOne(data);
-    return this.appendLinks(newCategory);
+    return newCategory;
   }
 
   async updateOneById(id, data) {
