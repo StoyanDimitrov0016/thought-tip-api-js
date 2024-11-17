@@ -21,9 +21,9 @@ class CategoryRepository {
     }
   }
 
-  async findManyByFilter(filter = {}, size = 10, skip = 0, sort = { popularity: -1 }) {
+  async findManyByFilter(filter = {}) {
     try {
-      const categories = await CategoryModel.find(filter).sort(sort).skip(skip).limit(size).lean();
+      const categories = await CategoryModel.find(filter).lean();
       return mongoDocumentFormatter(categories);
     } catch (error) {
       dbErrorHandler(error);
