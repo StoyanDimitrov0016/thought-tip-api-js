@@ -1,55 +1,55 @@
-import CategoryLinkBuilder from "../../lib/linkBuilders/subclasses/CategoryLinkBuilder.js";
-import CreatedResponse from "../../lib/responses/successResponses/CreatedResponse.js";
-import OkPaginatedResponse from "../../lib/responses/successResponses/OkPaginatedResponse.js";
-import OkSingleResponse from "../../lib/responses/successResponses/OkSingleResponse.js";
 import categoryService from "../../services/segmentation/category.service.js";
+import createMetadata from "../../lib/responses/helpers/metadata/createMetadata.js";
+import OkSingleResponse from "../../lib/responses/successExtensions/OkSingleResponse.js";
+import OkListResponse from "../../lib/responses/successExtensions/OkListResponse.js";
+import CreatedResponse from "../../lib/responses/successExtensions/CreatedResponse.js";
+
+const generateCategoryMetadata = (responseFormat, totalCount) =>
+  createMetadata(responseFormat, "category", totalCount);
+
+const generateResponse = (ResponseClass, title, detail, instance, data, metadata) =>
+  new ResponseClass(title, detail, instance, data, metadata);
 
 class CategoryController {
   async getOneBySlug(req, res, next) {
     try {
       const { slug } = req.params;
       const instance = req.originalUrl;
+      const user = req.user;
 
-      const category = await categoryService.getOneBySlug(slug);
+      const category = await categoryService.getOneBySlug(slug, user);
+      const metadata = generateCategoryMetadata("single", 1);
 
-      const response = new OkSingleResponse(
-        "Successful category retrieval",
-        "The category you requested has been successfully retrieved",
+      const response = generateResponse(
+        OkSingleResponse,
+        "Category Retrieved",
+        "The requested category has been successfully retrieved.",
         instance,
-        { category }
+        category,
+        metadata
       );
+
       res.status(response.status).json(response);
     } catch (error) {
       next(error);
     }
   }
 
-  async getMany(req, res, next) {
+  async getAll(req, res, next) {
     try {
       const instance = req.originalUrl;
-      const {
-        page = 1,
-        size = 10,
-        sort = "popularity",
-        direction = "desc",
-        ...filters
-      } = req.query;
+      const user = req.user;
 
-      const sortOrder = direction === "asc" ? 1 : -1;
-      const sortBy = { [sort]: sortOrder };
+      const categories = await categoryService.getAll(user);
 
-      const { categories, metadata } = await categoryService.getPaginatedCategories(
-        filters,
-        page,
-        size,
-        sortBy
-      );
+      const metadata = generateCategoryMetadata("list", categories.length);
 
-      const response = new OkPaginatedResponse(
-        "Successful categories retrieval.",
-        "The categories you requested have been successfully retrieved.",
+      const response = generateResponse(
+        OkListResponse,
+        "Categories Retrieved",
+        "The list of categories has been successfully retrieved.",
         instance,
-        { categories },
+        categories,
         metadata
       );
 
@@ -64,13 +64,16 @@ class CategoryController {
       const instance = req.originalUrl;
       const categoryCreateData = req.body;
 
-      const newCategory = await categoryService.createOne(categoryCreateData);
+      const createdCategory = await categoryService.createOne(categoryCreateData);
+      const metadata = generateCategoryMetadata("single", 1);
 
-      const response = new CreatedResponse(
-        "Category created",
-        "Category successfully created",
+      const response = generateResponse(
+        CreatedResponse,
+        "Category Created",
+        "The category has been successfully created.",
         instance,
-        { category: newCategory }
+        createdCategory,
+        metadata
       );
 
       res.status(response.status).json(response);
@@ -86,14 +89,15 @@ class CategoryController {
       const categoryUpdateData = req.body;
 
       const updatedCategory = await categoryService.updateOneById(categoryId, categoryUpdateData);
+      const metadata = generateCategoryMetadata("single", 1);
 
-      const response = new CreatedResponse(
-        "Category updated",
-        "Category successfully updated",
+      const response = generateResponse(
+        OkSingleResponse,
+        "Category Updated",
+        "The category has been successfully updated.",
         instance,
-        {
-          category: updatedCategory,
-        }
+        updatedCategory,
+        metadata
       );
 
       res.status(response.status).json(response);
