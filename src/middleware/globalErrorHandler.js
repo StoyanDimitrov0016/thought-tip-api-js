@@ -1,17 +1,29 @@
-import envConfig from "../config/envConfig.js";
-import ApplicationErrorBase from "../utils/errors/ApplicationErrorBase.js";
-import { InternalServerError } from "../utils/errors/customErrors.js";
+import AppErrorBase from "../lib/errors/customErrors/AppErrorBase.js";
+import { InternalServerError } from "../lib/errors/customErrors/ErrorSubclasses.js";
+import ErrorResponse from "../lib/responses/main/ErrorResponse.js";
 
 const globalErrorHandler = (err, req, res, next) => {
-  //TODO: Check if logging should be done only in development or in production too due to sensitive data exposing
+  let error;
   console.error("--Error from global error handler:", err);
-  const error = err instanceof ApplicationErrorBase ? err : new InternalServerError();
 
-  if (envConfig.nodeEnv !== "development") {
-    delete error.stack;
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    const instance = req.originalUrl; // Adjusted from req.originalPath
+    const title = "Bad Request - Invalid JSON";
+    const detail =
+      "The JSON provided in the request body is malformed. Please check your syntax and try again.";
+    const status = 400;
+    const errors = [{ field: "requestBody", message: "Invalid JSON format." }];
+    error = new ErrorResponse(title, status, detail, instance, errors);
+    return res.status(status).json(error);
   }
 
-  res.status(error.status).json(error);
+  error = err instanceof AppErrorBase ? err : new InternalServerError();
+  const { title, status, detail, errors, stack } = error;
+  const instance = req.originalUrl;
+
+  const errorResponse = new ErrorResponse(title, status, detail, instance, errors, stack);
+
+  res.status(error.status).json(errorResponse);
 };
 
 export default globalErrorHandler;
