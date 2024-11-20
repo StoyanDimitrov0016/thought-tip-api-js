@@ -23,7 +23,7 @@ class CategoryRepository {
 
   async findManyByFilter(filter = {}) {
     try {
-      const categories = await CategoryModel.find(filter).lean();
+      const categories = await CategoryModel.find(filter).sort({ popularity: -1 }).lean();
       return mongoDocumentFormatter(categories);
     } catch (error) {
       dbErrorHandler(error);

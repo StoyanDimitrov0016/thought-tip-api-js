@@ -1,62 +1,78 @@
 import TagModel from "../../models/segmentation/Tag.model.js";
-import { validateMongooseObjectId } from "../../utils/mongooseIdsValidators.js";
+import dbErrorHandler from "../../lib/errors/errorHandlers/dbErrorHandler.js";
+import mongoDocumentFormatter from "../../utils/mongoDocumentFormatter.js";
 
 class TagRepository {
   async findOneById(id) {
-    const validationResult = validateMongooseObjectId(id, false);
-    if (!validationResult) {
-      console.error("Invalid ID format for findOneById:", id);
-      return null;
+    try {
+      const tag = await TagModel.findById(id).lean();
+      return mongoDocumentFormatter(tag);
+    } catch (error) {
+      dbErrorHandler(error);
     }
-    return TagModel.findById(validationResult).lean();
   }
 
-  async findOneBySlug(slug) {
-    return TagModel.findOne({ slug }).lean();
-  }
-
-  async findAllByTopicId(topicId) {
-    const validationResult = validateMongooseObjectId(topicId, false);
-    if (!validationResult) {
-      console.error("Invalid topicId format for findAllByTopicId:", topicId);
-      return null;
+  async findOneByFilter(filter) {
+    try {
+      const tag = await TagModel.findOne(filter).lean();
+      return mongoDocumentFormatter(tag);
+    } catch (error) {
+      dbErrorHandler(error);
     }
-    return TagModel.find({ topicId: validationResult }).sort({ name: 1 }).lean();
   }
 
-  async createOne(data) {
-    return TagModel.create(data);
-  }
-
-  async updateOneById(id, data) {
-    const validationResult = validateMongooseObjectId(id, false);
-    if (!validationResult) {
-      console.error("Invalid ID format for updateOneById:", id);
-      return null;
+  async findManyByFilter(filter) {
+    try {
+      const tags = await TagModel.find(filter).sort({ name: 1 }).lean();
+      return mongoDocumentFormatter(tags);
+    } catch (error) {
+      dbErrorHandler(error);
     }
-    return TagModel.findByIdAndUpdate(validationResult, data, { new: true }).lean();
   }
 
-  async checkExistenceOfOne(query) {
-    const match = await TagModel.exists(query).lean();
-    return match;
-  }
-
-  async updateAllStatusesByTopicId(topicId, status) {
-    const validationResult = validateMongooseObjectId(topicId, false);
-    if (!validationResult) {
-      console.error("Invalid topicId format for updateManyByTopicId:", topicId);
-      return null;
+  async createOne(createData) {
+    try {
+      const newTag = await TagModel.create(createData);
+      const formattedTag = newTag.toObject();
+      return mongoDocumentFormatter(formattedTag);
+    } catch (error) {
+      dbErrorHandler(error);
     }
+  }
 
-    const updateResult = await TagModel.updateMany(
-      { topicId: validationResult },
-      { $set: { status } }
-    );
+  async updateOneById(id, updateData) {
+    try {
+      const updatedTag = await TagModel.findByIdAndUpdate(id, updateData, { new: true }).lean();
+      return mongoDocumentFormatter(updatedTag);
+    } catch (error) {
+      dbErrorHandler(error);
+    }
+  }
 
-    return updateResult;
+  async checkOneByFilter(filter) {
+    try {
+      const match = await TagModel.exists(filter).lean();
+      return mongoDocumentFormatter(match);
+    } catch (error) {
+      dbErrorHandler(error);
+    }
+  }
+
+  async countDocumentsByFilter(filter) {
+    try {
+      return await TagModel.countDocuments(filter);
+    } catch (error) {
+      dbErrorHandler(error);
+    }
+  }
+
+  async updateAllByTopicId(topicId, updateData, session = null) {
+    try {
+      return await TagModel.updateMany({ topicId }, updateData).session(session).lean();
+    } catch (error) {
+      dbErrorHandler(error);
+    }
   }
 }
-
 const tagRepository = new TagRepository();
 export default tagRepository;
