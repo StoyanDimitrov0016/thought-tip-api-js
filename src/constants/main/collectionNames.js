@@ -4,6 +4,7 @@ export const COLLECTION_NAMES = {
   TOPIC: "topic",
   TAG: "tag",
   USER: "user",
+  PROFILE: "profile",
   AUTHOR: "author",
   ARTICLE: "article",
   COMMENT: "comment",
