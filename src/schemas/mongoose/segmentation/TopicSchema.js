@@ -31,7 +31,15 @@ const TopicSchema = new Schema(
       ref: "Category",
       required: [true, "Category ID is required"],
     },
-    tags: [{ type: Types.ObjectId, ref: "Tag", required: true }],
+    tagPartials: {
+      type: [
+        {
+          id: { type: Types.ObjectId, ref: "Tag", required: true },
+          slug: { type: String, required: true, trim: true },
+        },
+      ],
+      default: [],
+    },
     status: {
       type: String,
       enum: {
