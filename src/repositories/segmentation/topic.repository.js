@@ -1,70 +1,79 @@
 import TopicModel from "../../models/segmentation/Topic.model.js";
-import { validateMongooseObjectId } from "../../utils/mongooseIdsValidators.js";
+import dbErrorHandler from "../../lib/errors/errorHandlers/dbErrorHandler.js";
+import mongoDocumentFormatter from "../../utils/mongoDocumentFormatter.js";
 
 class TopicRepository {
   async findOneById(id) {
-    const validationResult = validateMongooseObjectId(id, false);
-    if (!validationResult) {
-      console.error("Invalid ID format for findOneById:", id);
-      return null;
+    try {
+      const topic = await TopicModel.findById(id).lean();
+      return mongoDocumentFormatter(topic);
+    } catch (error) {
+      dbErrorHandler(error);
     }
-    return TopicModel.findById(validationResult).lean();
   }
 
-  async findOneBySlug(slug) {
-    return TopicModel.findOne({ slug }).lean();
-  }
-
-  async findAllByCategoryId(categoryId) {
-    const validationResult = validateMongooseObjectId(categoryId, false);
-    if (!validationResult) {
-      console.error("Invalid categoryId format for findAllByCategoryId:", categoryId);
-      return null;
+  async findOneByFilter(filter = {}) {
+    try {
+      const topic = await TopicModel.findOne(filter).lean();
+      return mongoDocumentFormatter(topic);
+    } catch (error) {
+      dbErrorHandler(error);
     }
-    return TopicModel.find({ categoryId: validationResult }).sort({ popularity: -1 }).lean();
   }
 
-  async createOne(data) {
-    return TopicModel.create(data);
-  }
-
-  async updateOneById(id, data) {
-    const validationResult = validateMongooseObjectId(id, false);
-    if (!validationResult) {
-      console.error("Invalid ID format for updateOneById:", id);
-      return null;
+  async findManyByFilter(filter) {
+    try {
+      const topics = await TopicModel.find(filter).sort({ popularity: -1 }).lean();
+      return mongoDocumentFormatter(topics);
+    } catch (error) {
+      dbErrorHandler(error);
     }
-    return TopicModel.findByIdAndUpdate(validationResult, data, { new: true }).lean();
   }
 
-  async checkExistenceOfOne(query) {
-    const match = await TopicModel.exists(query).lean();
-    return match;
-  }
-
-  async archiveOneById(id) {
-    const validationResult = validateMongooseObjectId(id, false);
-    if (!validationResult) {
-      console.error("Invalid ID format for archiveOneById:", id);
-      return null;
+  async createOne(createData) {
+    try {
+      const newTopic = await TopicModel.create(createData);
+      const formattedTopic = newTopic.toObject();
+      return mongoDocumentFormatter(formattedTopic);
+    } catch (error) {
+      dbErrorHandler(error);
     }
-    return TopicModel.findByIdAndUpdate(
-      validationResult,
-      { status: "archived" },
-      { new: true }
-    ).lean();
   }
 
-  async archiveAllByCategoryId(categoryId) {
-    const validationResult = validateMongooseObjectId(categoryId, false);
-    if (!validationResult) {
-      console.error("Invalid categoryId format for archiveAllByCategoryId:", categoryId);
-      return null;
+  async updateOneById(id, updateData) {
+    try {
+      const updatedTopic = await TopicModel.findByIdAndUpdate(id, updateData, {
+        new: true,
+      }).lean();
+      return mongoDocumentFormatter(updatedTopic);
+    } catch (error) {
+      dbErrorHandler(error);
     }
-    return TopicModel.updateMany(
-      { categoryId: validationResult },
-      { $set: { status: "archived" } }
-    );
+  }
+
+  async checkOneByFilter(filter = {}) {
+    try {
+      const exists = await TopicModel.exists(filter).lean();
+      return mongoDocumentFormatter(exists);
+    } catch (error) {
+      dbErrorHandler(error);
+    }
+  }
+
+  async countDocumentsByFilter(filter = {}) {
+    try {
+      return await TopicModel.countDocuments(filter);
+    } catch (error) {
+      dbErrorHandler(error);
+    }
+  }
+
+  async updateManyByCategoryId(categoryId, updateData) {
+    try {
+      return await TopicModel.updateMany({ categoryId }, updateData).lean();
+    } catch (error) {
+      dbErrorHandler(error);
+    }
   }
 }
 
