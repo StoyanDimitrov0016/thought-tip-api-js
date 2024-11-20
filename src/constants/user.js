@@ -1,2 +1,0 @@
-export const INITIAL_USER_ARTICLE_COUNT = 0;
-export const INITIAL_USER_ARTICLE_LIMIT = 20;
