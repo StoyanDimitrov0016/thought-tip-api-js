@@ -1,5 +1,5 @@
-import userRepository from "../repositories/user.repository.js";
 import { ForbiddenError } from "../lib/errors/customErrors/ErrorSubclasses.js";
+import authRepository from "../repositories/account/auth.repository.js";
 
 const isAuthenticated = async (req, res, next) => {
   try {
@@ -11,12 +11,13 @@ const isAuthenticated = async (req, res, next) => {
 
     const { id: requestedUserId } = req.user;
 
-    const userExists = await userRepository.checkExistenceOfOne({ _id: requestedUserId });
+    const userExists = await authRepository.checkOne({ _id: requestedUserId });
     if (!userExists) {
-      throw new ForbiddenError("User does not exist or has been removed.", [
+      res.clearCookie("token");
+      throw new ForbiddenError("User session is invalid.", [
         {
-          field: "userId",
-          message: "User record not found. Please ensure you are registered and logged in.",
+          field: "authentication",
+          message: "Your session is invalid. Please log in again.",
         },
       ]);
     }
