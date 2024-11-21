@@ -10,8 +10,8 @@ export const USER_VERIFICATION_LEVELS = {
   SUPPORTER: 2, // When the user supports the app
 };
 
+export const INITIAL_PROFILE_FOLLOWERS = 0;
+export const INITIAL_PROFILE_FOLLOWINGS = 0;
+
 export const INITIAL_PROFILE_PUBLISHED_ARTICLES = 0;
 export const INITIAL_PROFILE_ARTICLE_LIMIT = 0;
-
-export const INITIAL_USER_ARTICLE_COUNT = 0;
-export const INITIAL_USER_ARTICLE_LIMIT = 20;
