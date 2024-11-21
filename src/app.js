@@ -4,9 +4,8 @@ import cors from "cors";
 
 import setUserIfTokenExists from "./middleware/setUserIfTokenExists.js";
 
-import authRouter from "./routes/auth.route.js";
+import authRouter from "./routes/account/auth.route.js";
 import profileRouter from "./routes/profile.route.js";
-import userRouter from "./routes/user.route.js";
 import articleRouter from "./routes/article.route.js";
 import segmentationRouter from "./routes/segmentation.route.js";
 
@@ -23,10 +22,9 @@ const corsOptions = {
 
 const middlewareArray = [cors(corsOptions), express.json(), cookieParser(), setUserIfTokenExists];
 
-app.use(cors(corsOptions), express.json(), cookieParser(), setUserIfTokenExists);
+app.use(middlewareArray);
 
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/users", userRouter);
 app.use("/api/v1/my/profile", profileRouter);
 app.use("/api/v1/articles", articleRouter);
 app.use("/api/v1/segmentation", segmentationRouter);
