@@ -2,7 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import setUserIfTokenExists from "./middleware/setUserIfTokenExists.js";
+import setClientIfTokenExists from "./middleware/setClientIfTokenExists.js";
 
 import authRouter from "./routes/account/auth.route.js";
 import profileRouter from "./routes/profile.route.js";
@@ -20,7 +20,7 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization", "Cache-Control"],
 };
 
-const middlewareArray = [cors(corsOptions), express.json(), cookieParser(), setUserIfTokenExists];
+const middlewareArray = [cors(corsOptions), express.json(), cookieParser(), setClientIfTokenExists];
 
 app.use(middlewareArray);
 
