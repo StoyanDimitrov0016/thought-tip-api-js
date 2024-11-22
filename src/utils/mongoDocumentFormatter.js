@@ -2,14 +2,18 @@ import mongoose from "mongoose";
 
 const mongoDocumentFormatter = (document) => {
   if (Array.isArray(document)) {
-    return document.map((d) => mongoDocumentFormatter(d));
+    return document.map(mongoDocumentFormatter);
   }
 
   if (document instanceof mongoose.Document) {
-    document = document.toObject();
+    return mongoDocumentFormatter(document.toObject());
   }
 
   if (typeof document === "object" && document !== null) {
+    if (document instanceof mongoose.Types.ObjectId) {
+      return document.toHexString();
+    }
+
     const docCopy = { ...document };
 
     for (const key in docCopy) {
@@ -23,7 +27,6 @@ const mongoDocumentFormatter = (document) => {
     }
 
     const { _id, __v, ...rest } = docCopy;
-
     return { id: _id, ...rest };
   }
 
