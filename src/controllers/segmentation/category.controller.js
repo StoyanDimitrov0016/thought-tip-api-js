@@ -15,9 +15,9 @@ class CategoryController {
     try {
       const { slug } = req.params;
       const instance = req.originalUrl;
-      const user = req.user;
+      const client = req.client;
 
-      const category = await categoryService.getOneBySlug(slug, user);
+      const category = await categoryService.getOneBySlug(slug, client);
       const metadata = generateCategoryMetadata("single", 1);
 
       const response = generateResponse(
@@ -38,9 +38,9 @@ class CategoryController {
   async getAll(req, res, next) {
     try {
       const instance = req.originalUrl;
-      const user = req.user;
+      const client = req.client;
 
-      const categories = await categoryService.getAll(user);
+      const categories = await categoryService.getAll(client);
 
       const metadata = generateCategoryMetadata("list", categories.length);
 
