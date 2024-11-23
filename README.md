@@ -119,3 +119,130 @@ git clone https://github.com/your-repo/thought-tip-api-js.git
 cd thought-tip-api-js
 npm install
 ```
+
+# API Response Documentation
+
+This document provides a detailed overview of the response structure for the API endpoints in this application. The responses are designed to be flexible, standardized, and informative, with additional metadata to enhance the client-side user experience.
+
+## Overview of Response Formats
+
+Each response returned from the API adheres to one of the following formats:
+
+- **Single**: Represents a single object.
+- **List**: Represents a non-paginated list of objects.
+- **Paginated**: Represents a paginated collection of objects.
+- **Error**: Represents an error response.
+
+## Base Response Structure
+
+All responses inherit from the `BaseResponse` class. This class defines the essential structure of every API response.
+
+### Properties
+
+| Property    | Type      | Description                                                               |
+| ----------- | --------- | ------------------------------------------------------------------------- |
+| `status`    | `number`  | The HTTP status code of the response.                                     |
+| `success`   | `boolean` | Indicates whether the request was successful (`true`) or not (`false`).   |
+| `timestamp` | `string`  | ISO 8601 timestamp of when the response was generated.                    |
+| `type`      | `string`  | Describes the type of response based on the HTTP status code.             |
+| `format`    | `string`  | The format of the response (`single`, `list`, `paginated`, `error`).      |
+| `title`     | `string`  | A brief, human-readable summary of the response.                          |
+| `detail`    | `string`  | A detailed explanation of the response or error.                          |
+| `instance`  | `string`  | An optional identifier for the specific instance of the request or error. |
+
+---
+
+## Success Responses
+
+### `SuccessResponse`
+
+Used for basic successful responses.
+
+#### Additional Properties
+
+| Property | Type | Description |
+| -------- | ---- | ----------- |
+| None     |      |             |
+
+---
+
+### `CreatedResponse`
+
+Used for responses where a resource is successfully created.
+
+#### Additional Properties
+
+| Property   | Type     | Description                                     |
+| ---------- | -------- | ----------------------------------------------- |
+| `data`     | `object` | The created resource.                           |
+| `metadata` | `object` | Additional metadata about the created resource. |
+
+---
+
+### `OkSingleResponse`
+
+Used for responses returning a single resource.
+
+#### Additional Properties
+
+| Property   | Type     | Description                             |
+| ---------- | -------- | --------------------------------------- |
+| `data`     | `object` | The single resource being returned.     |
+| `metadata` | `object` | Additional metadata about the resource. |
+
+---
+
+### `OkListResponse`
+
+Used for responses returning a non-paginated list of resources.
+
+#### Additional Properties
+
+| Property   | Type     | Description                           |
+| ---------- | -------- | ------------------------------------- |
+| `data`     | `array`  | The list of resources being returned. |
+| `metadata` | `object` | Metadata including `totalCount`.      |
+
+**Metadata Example:**
+
+```json
+{
+  "collectionName": "categories",
+  "collectionType": "restricted",
+  "links": {
+    "self": { "href": "/categories", "method": "GET" }
+  },
+  "totalCount": 42
+}
+```
+
+### `OkPaginatedResponse`
+
+Used for responses returning a paginated list of resources.
+
+#### Additional Properties
+
+| Property   | Type     | Description                                 |
+| ---------- | -------- | ------------------------------------------- |
+| `data`     | `array`  | The list of resources for the current page. |
+| `metadata` | `object` | Metadata including pagination details.      |
+
+#### Metadata Example
+
+```json
+{
+  "collectionName": "articles",
+  "collectionType": "community",
+  "links": {
+    "self": { "href": "/articles?page=2&size=10", "method": "GET" }
+  },
+  "totalCount": 100,
+  "pagination": {
+    "page": 2,
+    "size": 10,
+    "totalPages": 10,
+    "hasNext": true,
+    "hasPrevious": true
+  }
+}
+```
