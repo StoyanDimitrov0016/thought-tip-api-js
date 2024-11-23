@@ -1,111 +1,96 @@
 import { Schema, Types } from "mongoose";
+import {
+  ARTICLE_DISCUSSION_DEFAULT_VALUE,
+  ARTICLE_MAX_CHARGE,
+  ARTICLE_MAX_READING_TIME,
+  ARTICLE_MIN_CHARGE,
+  ARTICLE_MIN_READING_TIME,
+  ARTICLE_SLUG_REGEX,
+} from "../../constants/articleConstants.js";
 
 const ArticleSchema = new Schema(
   {
     title: {
       type: String,
-      required: [true, "Title is required"],
-      minLength: [3, "Title must be at least 3 characters long"],
-      maxLength: [100, "Title must be at most 100 characters long"],
-      match: [/^[a-zA-Z0-9\s.,!?()'":;&%$#@-]+$/, "Title contains unsupported characters"],
+      required: true,
       trim: true,
     },
     slug: {
       type: String,
-      required: [true, "Slug is required"],
-      trim: true,
+      required: true,
       unique: true,
+      trim: true,
+      match: [ARTICLE_SLUG_REGEX, "Slug should contain only alphanumeric characters"],
     },
     thumbnail: {
       type: String,
-      required: [true, "Thumbnail is required"],
-      match: [/^https:\/\/.*\.(?:png|jpg|jpeg|gif)$/, "Thumbnail must be a valid HTTPS image URL"],
-      maxLength: [2048, "Thumbnail URL is too long"],
+      required: true,
       trim: true,
     },
-    previewText: {
+    hook: {
       type: String,
-      required: [true, "Preview text is required"],
-      minLength: [3, "Preview must be at least 3 characters long"],
-      maxLength: [250, "Preview text must be at most 250 characters long"],
+      required: true,
       trim: true,
     },
     content: {
       type: String,
-      required: [true, "Content is required"],
-      minLength: [10, "Content must be at least 10 characters long"],
-      maxLength: [16000, "Content must be at most 16000 characters long or roughly 3000 words"],
+      required: true,
       trim: true,
+    },
+    author: {
+      type: Types.ObjectId,
+      ref: "Profile",
+      required: true,
     },
     category: {
       type: Types.ObjectId,
       ref: "Category",
-      required: [true, "At least one category has to be selected"],
+      required: true,
     },
     topics: [
       {
         type: Types.ObjectId,
         ref: "Topic",
-        required: [true, "At least one topic has to be selected"],
-        validate: [
-          {
-            validator: function (topics) {
-              return topics.length > 0;
-            },
-            message: "At least one topic has to be selected",
-          },
-          {
-            validator: function (topics) {
-              return new Set(topics.map((topic) => topic.toString())).size === topics.length;
-            },
-            message: "Duplicate topics are not allowed",
-          },
-        ],
+        required: true,
       },
     ],
-    tags: {
-      type: [{ type: Types.ObjectId, ref: "Tag", required: true }],
-      required: [true, "At least one tag is required"],
-      validate: [
-        {
-          validator: function (tags) {
-            return tags.length > 0;
-          },
-          message: "At least one tag has to be selected",
-        },
-        {
-          validator: function (tags) {
-            return new Set(tags.map((tag) => tag.toString())).size === tags.length;
-          },
-          message: "Duplicate tags are not allowed",
-        },
+    tags: [
+      {
+        type: Types.ObjectId,
+        ref: "Tag",
+        required: true,
+      },
+    ],
+    readingTime: {
+      type: Number,
+      required: true,
+      min: [
+        ARTICLE_MIN_READING_TIME,
+        `Reading time cannot be less than ${ARTICLE_MIN_READING_TIME} minute`,
+      ],
+      max: [
+        ARTICLE_MAX_READING_TIME,
+        `Reading time cannot exceed ${ARTICLE_MAX_READING_TIME} minutes`,
       ],
     },
-    averageReadingTime: {
+    charge: {
       type: Number,
-      default: 1,
-      min: [1, "Average reading time must be at least 1 minute"],
-      max: [60, "Average reading time must not exceed 60 minutes"],
+      min: [ARTICLE_MIN_CHARGE, `Charge cannot be less than ${ARTICLE_MIN_CHARGE} sats`],
+      max: [ARTICLE_MAX_CHARGE, `Charge cannot exceed ${ARTICLE_MAX_CHARGE} sats`],
+      default: ARTICLE_MIN_CHARGE,
     },
-    author: {
-      type: Types.ObjectId,
-      ref: "User",
-      required: [true, "Author is required"],
-    },
-    isPayWalled: {
+    discussion: {
       type: Boolean,
-      default: false,
-      required: [true, "Paywall status must be provided"],
-    },
-    enabledComments: {
-      type: Boolean,
-      default: true,
-      required: [true, "Comments optionality  must be provided"],
+      default: ARTICLE_DISCUSSION_DEFAULT_VALUE,
     },
   },
   { timestamps: true }
 );
-
-ArticleSchema.index({ author: 1, topics: 1, tags: 1, title: "text" });
+ArticleSchema.index({ title: "text", hook: "text", content: "text" });
+ArticleSchema.index({ category: 1, author: 1 });
+ArticleSchema.index({ topics: 1 });
+ArticleSchema.index({ tags: 1 });
+ArticleSchema.index({ charge: 1 });
+ArticleSchema.index({ readingTime: 1 });
 
 export default ArticleSchema;
