@@ -1,4 +1,4 @@
-import CommentModel from "../../models/discussion/Comment.model.js";
+import CommentModel from "../models/Comment.model.js";
 import dbErrorHandler from "../../utils/handlers/dbErrorHandler.js";
 
 class CommentRepository {
