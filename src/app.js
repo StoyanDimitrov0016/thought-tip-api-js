@@ -10,6 +10,7 @@ import articleRouter from "./routes/article.route.js";
 import segmentationRouter from "./routes/segmentation.route.js";
 
 import globalErrorHandler from "./middleware/globalErrorHandler.js";
+import commentRouter from "./routes/comment.route.js";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/my/profile", profileRouter);
 app.use("/api/v1/articles", articleRouter);
 app.use("/api/v1/segmentation", segmentationRouter);
+app.use("/api/v1/articles/:articleId/comments", commentRouter);
 app.use(globalErrorHandler);
 
 export default app;
