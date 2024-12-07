@@ -1,6 +1,6 @@
 import { Router } from "express";
-import commentRoutes from "./comment.routes";
-import replyRoutes from "./reply.routes";
+import commentRoutes from "./comment.routes.js";
+import replyRoutes from "./reply.routes.js";
 
 const discussionRoutes = Router();
 
