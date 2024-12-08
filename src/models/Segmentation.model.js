@@ -1,31 +1,53 @@
-import { model, Schema } from "mongoose";
-
-const SEGMENTATION_TYPES = { CATEGORY: "category", TOPIC: "topic", TAG: "tag" };
-const SEGMENTATION_STATUSES = { ACTIVE: "active", INACTIVE: "inactive" };
-const SEGMENTATION_DEFAULT_POPULARITY_SCORE = 0;
+import { model, Schema, Types } from "mongoose";
 
 const segmentationSchema = new Schema(
   {
-    name: { type: String, required: true },
-    slug: { type: String, unique: true },
-    description: { type: String, required: true },
+    parentId: {
+      type: Types.ObjectId,
+      ref: "Segmentation",
+      required: function () {
+        return this.type !== "category";
+      },
+      default: null,
+    },
+    name: {
+      type: String,
+      required: [true, "Name is required"],
+      minlength: [3, "Name must be at least 3 characters long"],
+      maxlength: [50, "Name can't exceed 50 characters"],
+    },
+    slug: {
+      type: String,
+      required: [true, "Slug is required"],
+      unique: true,
+    },
+    description: {
+      type: String,
+      maxlength: [500, "Description can't exceed 500 characters"],
+    },
     type: {
       type: String,
-      enum: Object.values(SEGMENTATION_TYPES),
-      required: true,
+      enum: ["category", "topic", "tag"],
+      required: [true, "Type is required"],
     },
-    parentId: { type: Schema.Types.ObjectId, ref: "Segmentation", default: null },
     status: {
       type: String,
-      enum: Object.values(SEGMENTATION_STATUSES),
-      default: SEGMENTATION_STATUSES.ACTIVE,
+      enum: ["active", "inactive"],
+      required: [true, "Status is required"],
+      default: "active",
     },
-    popularity: { type: Number, default: SEGMENTATION_DEFAULT_POPULARITY_SCORE },
+    popularity: {
+      type: Number,
+      default: 0,
+      min: [0, "Popularity can't be negative"],
+      max: [1000, "Popularity can't exceed 1,000"],
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
-
-segmentationSchema.index({ type: 1, parentId: 1 });
 
 const SegmentationModel = model("Segmentation", segmentationSchema);
 export default SegmentationModel;
