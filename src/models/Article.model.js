@@ -23,6 +23,11 @@ const articleSchema = new Schema(
       minlength: [3, "Hook must be at least 3 characters long"],
       maxlength: [200, "Hook can't exceed 200 characters"],
     },
+    author: {
+      type: Types.ObjectId,
+      ref: "User",
+      required: [true, "Author required"],
+    },
     categoryId: {
       type: Types.ObjectId,
       ref: "Segmentation",
