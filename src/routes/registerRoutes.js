@@ -1,5 +1,8 @@
 import express from "express";
 
+import clientValidator from "../middleware/validators/clientValidator.js";
+import requireAuth from "../middleware/guards/requireAuth.js";
+
 import authRoutes from "./account/auth.routes.js";
 import profileRoutes from "./account/profile.routes.js";
 import segmentationRoutes from "./segmentation/segmentation.routes.js";
@@ -11,8 +14,21 @@ import bookmarkRoutes from "./interactions/bookmark.routes.js";
 
 const API_PREFIX = "/api/v1";
 
+//Set each non-GET method to require client validation
+const auth = (req, res, next) => {
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
+    return Promise.resolve()
+      .then(() => clientValidator(req, res, () => {}))
+      .then(() => requireAuth(req, res, () => {}))
+      .then(() => next())
+      .catch((error) => next(error));
+  }
+  return next();
+};
+
 export default function registerRoutes(app) {
   const apiRoute = express.Router();
+  apiRoute.use(auth);
 
   apiRoute.use("/auth", authRoutes);
   apiRoute.use("/profile", profileRoutes);
