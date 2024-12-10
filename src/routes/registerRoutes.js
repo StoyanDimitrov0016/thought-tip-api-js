@@ -11,19 +11,22 @@ import discussionRoutes from "./discussion/discussion.routes.js";
 import likeRoutes from "./interactions/like.routes.js";
 import relationshipRoutes from "./interactions/relationship.routes.js";
 import bookmarkRoutes from "./interactions/bookmark.routes.js";
+import { promisifyMiddleware } from "../utils/promisifyMiddleware.js";
 
 const API_PREFIX = "/api/v1";
 
 //Set each non-GET method to require client validation
-const auth = (req, res, next) => {
+const auth = async (req, res, next) => {
   if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
-    return Promise.resolve()
-      .then(() => clientValidator(req, res, () => {}))
-      .then(() => requireAuth(req, res, () => {}))
-      .then(() => next())
-      .catch((error) => next(error));
+    try {
+      await promisifyMiddleware(clientValidator)(req, res);
+      requireAuth(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    next();
   }
-  return next();
 };
 
 export default function registerRoutes(app) {
