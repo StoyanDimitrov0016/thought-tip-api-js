@@ -1,4 +1,4 @@
-import { responseManager } from "../../lib/managers/responseManager.js";
+import { responseFactory } from "../factories/responseFactory.js";
 
 export const wrapController = (asyncControllerFunc) => {
   return async (req, res, next) => {
@@ -10,7 +10,7 @@ export const wrapController = (asyncControllerFunc) => {
         return res.status(status).end();
       }
 
-      const response = responseManager({ status, format, detail, data, metadata, instance });
+      const response = responseFactory({ status, format, detail, instance, data, metadata });
 
       res.status(status).json(response);
     } catch (error) {

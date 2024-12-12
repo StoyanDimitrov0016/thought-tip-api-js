@@ -1,8 +1,8 @@
-import { documentFormatter as formatter } from "../helpers/documentFormatter.js";
+import { documentFormatter } from "../../utils/documentFormatter.js";
 
 export const wrapService = (asyncServiceFunc) => {
   return async (...args) => {
     const result = await asyncServiceFunc(...args);
-    return formatter(result);
+    return documentFormatter(result);
   };
 };
