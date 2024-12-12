@@ -10,7 +10,7 @@ export const wrapController = (asyncControllerFunc) => {
         return res.status(status).end();
       }
 
-      const response = responseManager({ status, format, detail, instance, data, metadata });
+      const response = responseManager({ status, format, detail, data, metadata, instance });
 
       res.status(status).json(response);
     } catch (error) {
