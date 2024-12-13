@@ -1,16 +1,15 @@
-import { InternalServerError } from "../classes/customErrors.js";
 import { ListMetadata, PaginatedMetadata, SingleMetadata } from "../classes/customMetadata.js";
-
-const linkGenerator = {};
+import { InternalServerError } from "../classes/customErrors.js";
+import { createLinks } from "../../utils/linksGenerator.js";
 
 export const metadataFactory = ({ format, collectionName, totalCount, page, size }) => {
   switch (format) {
     case "single":
-      return new SingleMetadata(linkGenerator, collectionName);
+      return new SingleMetadata(createLinks, collectionName);
     case "list":
-      return new ListMetadata(linkGenerator, collectionName, totalCount);
+      return new ListMetadata(createLinks, collectionName, totalCount);
     case "paginated":
-      return new PaginatedMetadata(linkGenerator, collectionName, totalCount, page, size);
+      return new PaginatedMetadata(createLinks, collectionName, totalCount, page, size);
 
     default:
       throw new InternalServerError(`Unsupported format in the metadata factory: ${format}`);
