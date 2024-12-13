@@ -8,7 +8,7 @@ import tokenValidator from "./validators/tokenValidator.js";
 import globalErrorHandler from "./globalErrorHandler.js";
 
 const corsOptions = {
-  origin: "https://your-frontend-domain.com",
+  origin: "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
