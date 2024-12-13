@@ -42,14 +42,15 @@ export const objectIdToString = (objectId) => {
  * @param {string | Types.ObjectId} id1 - The first ID to compare.
  * @param {string | Types.ObjectId} id2 - The second ID to compare.
  * @returns {boolean} - True if both IDs are equal, false otherwise.
- * @throws {Error} - If one or both IDs are invalid.
  */
 export const areIdsEqual = (id1, id2) => {
   if (!isValidObjectId(id1) || !isValidObjectId(id2)) {
-    throw new Error(
-      `Invalid ID(s) for comparison: ${id1} (type: ${typeof id1}), ${id2} (type: ${typeof id2})`
-    );
+    return false;
   }
 
-  return Types.ObjectId(id1).equals(Types.ObjectId(id2));
+  const objectId1 = new Types.ObjectId(id1);
+  const objectId2 = new Types.ObjectId(id2);
+
+  const match = objectId1.toHexString() === objectId2.toHexString();
+  return match;
 };
