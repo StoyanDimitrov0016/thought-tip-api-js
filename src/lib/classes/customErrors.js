@@ -1,4 +1,4 @@
-class ApplicationError extends Error {
+export class ApplicationError extends Error {
   constructor(status, title, detail) {
     super(detail);
     this.status = status;
