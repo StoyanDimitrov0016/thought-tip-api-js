@@ -23,6 +23,12 @@ const articleSchema = new Schema(
       minlength: [3, "Hook must be at least 3 characters long"],
       maxlength: [200, "Hook can't exceed 200 characters"],
     },
+    content: {
+      type: String,
+      required: [true, "Content required"],
+      minlength: [1, "Hook must be at least 1 characters long"],
+      maxlength: [15000, "Hook can't exceed 15 000 characters"],
+    },
     author: {
       type: Types.ObjectId,
       ref: "User",
@@ -43,7 +49,7 @@ const articleSchema = new Schema(
       validate: [
         {
           validator: function (value) {
-            return value && value.length > 0 && value.length < 3;
+            return value && value.length > 0 && value.length <= 2;
           },
           message: "Topics must include at least 1 and at most 2 items",
         },
@@ -65,7 +71,7 @@ const articleSchema = new Schema(
       validate: [
         {
           validator: function (value) {
-            return value && value.length > 0 && value.length < 3;
+            return value && value.length > 0 && value.length <= 2;
           },
           message: "Tags must include at least 1 and at most 2 items",
         },
