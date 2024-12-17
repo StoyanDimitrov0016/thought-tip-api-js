@@ -1,5 +1,6 @@
 export class SingleMetadata {
   constructor(linkGenerator, collectionName) {
+    this.collectionName = collectionName;
     this.links = linkGenerator(collectionName);
   }
 }
@@ -26,3 +27,9 @@ export class PaginatedMetadata extends ListMetadata {
     };
   }
 }
+
+export const Metadata = Object.freeze({
+  SingleMetadata,
+  ListMetadata,
+  PaginatedMetadata,
+});

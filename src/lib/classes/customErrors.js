@@ -68,3 +68,17 @@ export class InternalServerError extends ApplicationError {
     super(500, "Internal Server Error", detail);
   }
 }
+
+export const Errors = Object.freeze({
+  ApplicationError,
+  BadRequestError,
+  ValidationError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  DuplicationError,
+  URITooLongError,
+  TooManyRequestsError,
+  DatabaseError,
+  InternalServerError,
+});

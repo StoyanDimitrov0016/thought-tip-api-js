@@ -37,3 +37,10 @@ export class CreateResponse extends BaseSuccessResponse {
     super(201, format, "Successful resource/s creation", detail, instance, data, metadata);
   }
 }
+
+export const Responses = Object.freeze({
+  ErrorResponse,
+  BaseSuccessResponse,
+  OkResponse,
+  CreateResponse,
+});
