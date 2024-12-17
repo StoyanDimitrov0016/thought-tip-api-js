@@ -6,7 +6,8 @@ const envConfig = {
   port: process.env.PORT,
   baseURL: process.env.BASE_URL,
   mongoUri: process.env.MONGO_URI,
-  jwtSecret: process.env.JWT_SECRET,
+  accessTokenSecret: process.env.ACCESS_TOKEN_JWT_SECRET,
+  refreshTokenSecret: process.env.REFRESH_TOKEN_JWT_SECRET,
   nodeEnv: process.env.NODE_ENV,
 };
 
