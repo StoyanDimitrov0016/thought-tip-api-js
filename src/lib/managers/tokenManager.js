@@ -55,8 +55,10 @@ class TokenManager {
   signAccessToken(user) {
     try {
       const payload = this.createAccessTokenPayload(user);
+      const expiresIn = this.parseExpiry(this.accessTokenExpiry);
+
       return jwt.sign(payload, this.#accessTokenSecret, {
-        expiresIn: this.accessTokenExpiry,
+        expiresIn,
         algorithm: this.algorithm,
       });
     } catch (error) {
@@ -67,13 +69,14 @@ class TokenManager {
   async signRefreshToken(user) {
     try {
       const payload = this.createRefreshTokenPayload(user);
+
+      const expiresIn = this.parseExpiry(this.refreshTokenExpiry);
+      const expiresAt = new Date(Date.now() + expiresIn * 1000);
+
       const refreshToken = jwt.sign(payload, this.#refreshTokenSecret, {
-        expiresIn: this.refreshTokenExpiry,
+        expiresIn,
         algorithm: this.algorithm,
       });
-
-      const expiresAt = new Date();
-      expiresAt.setSeconds(expiresAt.getSeconds() + this.parseExpiry(this.refreshTokenExpiry));
 
       await this.Model.create({
         userId: payload.id,
