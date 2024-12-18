@@ -1,8 +1,10 @@
+import { ForbiddenError } from "../../lib/classes/customErrors.js";
+
 export default function requireGuest(req, res, next) {
   try {
-    const { id } = req.client || {};
-    if (id) throw Error("Forbidden");
-
+    if (req.user.id) {
+      throw new ForbiddenError();
+    }
     next();
   } catch (error) {
     next(error);
