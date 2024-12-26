@@ -2,6 +2,11 @@ import { model, Schema, Types } from "mongoose";
 
 const discussionSchema = new Schema(
   {
+    author: {
+      type: Types.ObjectId,
+      ref: "User",
+      required: [true, "Author ID is required"],
+    },
     parentId: {
       type: Types.ObjectId,
       ref: "Discussion",
@@ -12,11 +17,6 @@ const discussionSchema = new Schema(
       type: Types.ObjectId,
       ref: "Article",
       required: [true, "Article ID is required"],
-    },
-    author: {
-      type: Types.ObjectId,
-      ref: "User",
-      required: [true, "Author ID is required"],
     },
     type: {
       type: String,
