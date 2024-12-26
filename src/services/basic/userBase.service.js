@@ -55,12 +55,7 @@ class UserBaseService extends ServiceBase {
         articleCountLimit: 20,
         publishedArticles: 0,
       },
-      details: {
-        firstName: null,
-        lastName: null,
-        profilePicture: null,
-        bio: null,
-      },
+      details: { firstName: null, lastName: null, profilePicture: null, bio: null },
     };
 
     const created = await this.Model.create(userData);
